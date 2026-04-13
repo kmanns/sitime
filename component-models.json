@@ -530,5 +530,903 @@
         "valueType": "string"
       }
     ]
+  },
+  {
+    "id": "blog-post",
+    "fields": []
+  },
+  {
+    "id": "blog-tiles",
+    "fields": []
+  },
+  {
+    "id": "circle-carousel",
+    "fields": [
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "alignment",
+        "label": "Alignment",
+        "description": "Horizontal alignment of the carousel",
+        "value": "center",
+        "required": false,
+        "options": [
+          {
+            "name": "Left",
+            "value": "left"
+          },
+          {
+            "name": "Center",
+            "value": "center"
+          },
+          {
+            "name": "Right",
+            "value": "right"
+          }
+        ]
+      },
+      {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "autoplay",
+        "label": "Enable Autoplay",
+        "description": "Automatically cycle through items every 4 seconds",
+        "value": true,
+        "required": false
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "itemsMobile",
+        "label": "Items Per View (Mobile)",
+        "description": "Number of circles visible on mobile screens",
+        "value": 2,
+        "required": false,
+        "validation": {
+          "numberMin": 1,
+          "numberMax": 4
+        }
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "itemsTablet",
+        "label": "Items Per View (Tablet)",
+        "description": "Number of circles visible on tablet screens",
+        "value": 4,
+        "required": false,
+        "validation": {
+          "numberMin": 2,
+          "numberMax": 6
+        }
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "itemsDesktop",
+        "label": "Items Per View (Desktop)",
+        "description": "Number of circles visible on desktop screens",
+        "value": 6,
+        "required": false,
+        "validation": {
+          "numberMin": 3,
+          "numberMax": 8
+        }
+      }
+    ]
+  },
+  {
+    "id": "hero-cta",
+    "fields": []
+  },
+  {
+    "id": "newsletter",
+    "fields": [
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "align",
+        "label": "Content Alignment",
+        "description": "Horizontal alignment for the text and form",
+        "value": "center",
+        "required": false,
+        "options": [
+          {
+            "name": "Start (logical)",
+            "value": "start"
+          },
+          {
+            "name": "Left",
+            "value": "left"
+          },
+          {
+            "name": "Center",
+            "value": "center"
+          },
+          {
+            "name": "Right",
+            "value": "right"
+          },
+          {
+            "name": "End (logical)",
+            "value": "end"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "backgroundColor",
+        "label": "Background Color",
+        "description": "Use a named variant or override with Section Metadata for custom hex",
+        "value": "neutral",
+        "required": false,
+        "options": [
+          {
+            "name": "Neutral",
+            "value": "neutral"
+          },
+          {
+            "name": "Light",
+            "value": "light"
+          },
+          {
+            "name": "White",
+            "value": "white"
+          },
+          {
+            "name": "Brand",
+            "value": "brand"
+          },
+          {
+            "name": "Dark",
+            "value": "dark"
+          },
+          {
+            "name": "Accent",
+            "value": "accent"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "backgroundStyle",
+        "label": "Background Style",
+        "description": "Visual treatment layered on top of background color",
+        "value": "solid",
+        "required": false,
+        "options": [
+          {
+            "name": "None",
+            "value": "none"
+          },
+          {
+            "name": "Solid",
+            "value": "solid"
+          },
+          {
+            "name": "Subtle Gradient",
+            "value": "subtle-gradient"
+          },
+          {
+            "name": "Mesh Gradient",
+            "value": "mesh-gradient"
+          },
+          {
+            "name": "Noise Texture",
+            "value": "noise-texture"
+          },
+          {
+            "name": "Split Tone",
+            "value": "split-tone"
+          },
+          {
+            "name": "Radial Glow",
+            "value": "radial-glow"
+          },
+          {
+            "name": "Duotone",
+            "value": "duotone"
+          },
+          {
+            "name": "Top Glow",
+            "value": "top-glow"
+          },
+          {
+            "name": "Bottom Fade",
+            "value": "bottom-fade"
+          },
+          {
+            "name": "Diagonal Sweep",
+            "value": "diagonal-sweep"
+          },
+          {
+            "name": "Grid Fade",
+            "value": "grid-fade"
+          },
+          {
+            "name": "Image Wash",
+            "value": "image-wash"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "backgroundImage",
+        "label": "Background Image URL",
+        "description": "Used when Background Style is Image Wash",
+        "value": "",
+        "required": false
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "buttonStyle",
+        "label": "Button Style",
+        "description": "Corner style for the sign up button",
+        "value": "default",
+        "required": false,
+        "options": [
+          {
+            "name": "Default",
+            "value": "default"
+          },
+          {
+            "name": "Pill",
+            "value": "pill"
+          },
+          {
+            "name": "Sharp",
+            "value": "sharp"
+          },
+          {
+            "name": "Soft",
+            "value": "soft"
+          },
+          {
+            "name": "Rounded Large",
+            "value": "rounded-lg"
+          },
+          {
+            "name": "Outline",
+            "value": "outline"
+          },
+          {
+            "name": "Ghost",
+            "value": "ghost"
+          },
+          {
+            "name": "Elevated",
+            "value": "elevated"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "buttonWidth",
+        "label": "Button Width",
+        "description": "Width preset for the sign up button",
+        "value": "medium",
+        "required": false,
+        "options": [
+          {
+            "name": "Auto",
+            "value": "auto"
+          },
+          {
+            "name": "Narrow",
+            "value": "narrow"
+          },
+          {
+            "name": "Medium",
+            "value": "medium"
+          },
+          {
+            "name": "Wide",
+            "value": "wide"
+          },
+          {
+            "name": "Fluid",
+            "value": "fluid"
+          },
+          {
+            "name": "Fit Content",
+            "value": "fit-content"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "density",
+        "label": "Spacing Density",
+        "description": "Adjust vertical rhythm and control height",
+        "value": "comfortable",
+        "required": false,
+        "options": [
+          {
+            "name": "XX-Compact",
+            "value": "xx-compact"
+          },
+          {
+            "name": "Compact",
+            "value": "compact"
+          },
+          {
+            "name": "X-Compact",
+            "value": "x-compact"
+          },
+          {
+            "name": "Comfortable",
+            "value": "comfortable"
+          },
+          {
+            "name": "Spacious",
+            "value": "spacious"
+          },
+          {
+            "name": "X-Spacious",
+            "value": "x-spacious"
+          },
+          {
+            "name": "XX-Spacious",
+            "value": "xx-spacious"
+          },
+          {
+            "name": "Responsive",
+            "value": "responsive"
+          },
+          {
+            "name": "Adaptive",
+            "value": "adaptive"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "formGap",
+        "label": "Form Gap",
+        "description": "Horizontal gap between email field and button",
+        "value": "auto",
+        "required": false,
+        "options": [
+          {
+            "name": "Auto (from Density)",
+            "value": "auto"
+          },
+          {
+            "name": "None",
+            "value": "none"
+          },
+          {
+            "name": "XX-Small",
+            "value": "xxsmall"
+          },
+          {
+            "name": "X-Small",
+            "value": "xsmall"
+          },
+          {
+            "name": "Small",
+            "value": "small"
+          },
+          {
+            "name": "Medium",
+            "value": "medium"
+          },
+          {
+            "name": "Large",
+            "value": "large"
+          },
+          {
+            "name": "X-Large",
+            "value": "xlarge"
+          },
+          {
+            "name": "XX-Large",
+            "value": "xxlarge"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "emailStyle",
+        "label": "Email Field Style",
+        "description": "Visual style for the email input field",
+        "value": "outlined",
+        "required": false,
+        "options": [
+          {
+            "name": "Outlined",
+            "value": "outlined"
+          },
+          {
+            "name": "Filled",
+            "value": "filled"
+          },
+          {
+            "name": "Underlined",
+            "value": "underlined"
+          },
+          {
+            "name": "Pill",
+            "value": "pill"
+          },
+          {
+            "name": "Sharp",
+            "value": "sharp"
+          },
+          {
+            "name": "Minimal",
+            "value": "minimal"
+          },
+          {
+            "name": "Inset",
+            "value": "inset"
+          },
+          {
+            "name": "Soft",
+            "value": "soft"
+          },
+          {
+            "name": "Glass",
+            "value": "glass"
+          },
+          {
+            "name": "High Contrast",
+            "value": "high-contrast"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "buttonColorEmpty",
+        "label": "Button Color (Empty)",
+        "description": "Button color before any email is entered",
+        "value": "muted",
+        "required": false,
+        "options": [
+          {
+            "name": "Muted",
+            "value": "muted"
+          },
+          {
+            "name": "Default",
+            "value": "default"
+          },
+          {
+            "name": "Transparent",
+            "value": "transparent"
+          },
+          {
+            "name": "White",
+            "value": "white"
+          },
+          {
+            "name": "Brand",
+            "value": "brand"
+          },
+          {
+            "name": "Accent",
+            "value": "accent"
+          },
+          {
+            "name": "Dark",
+            "value": "dark"
+          },
+          {
+            "name": "Outline Dark",
+            "value": "outline-dark"
+          },
+          {
+            "name": "Success",
+            "value": "success"
+          },
+          {
+            "name": "Warning",
+            "value": "warning"
+          },
+          {
+            "name": "Negative",
+            "value": "negative"
+          },
+          {
+            "name": "Info",
+            "value": "info"
+          },
+          {
+            "name": "Inherit",
+            "value": "inherit"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "buttonColorFilled",
+        "label": "Button Color (Filled)",
+        "description": "Button color after email text is entered",
+        "value": "dark",
+        "required": false,
+        "options": [
+          {
+            "name": "Muted",
+            "value": "muted"
+          },
+          {
+            "name": "Default",
+            "value": "default"
+          },
+          {
+            "name": "Transparent",
+            "value": "transparent"
+          },
+          {
+            "name": "White",
+            "value": "white"
+          },
+          {
+            "name": "Brand",
+            "value": "brand"
+          },
+          {
+            "name": "Accent",
+            "value": "accent"
+          },
+          {
+            "name": "Dark",
+            "value": "dark"
+          },
+          {
+            "name": "Outline Dark",
+            "value": "outline-dark"
+          },
+          {
+            "name": "Success",
+            "value": "success"
+          },
+          {
+            "name": "Warning",
+            "value": "warning"
+          },
+          {
+            "name": "Negative",
+            "value": "negative"
+          },
+          {
+            "name": "Info",
+            "value": "info"
+          },
+          {
+            "name": "Inherit",
+            "value": "inherit"
+          }
+        ]
+      },
+      {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "fullWidth",
+        "label": "Full Width Background",
+        "description": "Expand the newsletter background band to full viewport width",
+        "value": false,
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "promotional-hero",
+    "fields": []
+  },
+  {
+    "id": "search-bar",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "placeholder",
+        "value": "Search Products",
+        "label": "Placeholder Text",
+        "description": "The placeholder text shown in the search input",
+        "required": false
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "alignment",
+        "value": "center",
+        "label": "Alignment",
+        "description": "Horizontal alignment of the search bar",
+        "required": false,
+        "options": [
+          {
+            "name": "Left",
+            "value": "left"
+          },
+          {
+            "name": "Center",
+            "value": "center"
+          },
+          {
+            "name": "Right",
+            "value": "right"
+          }
+        ]
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "resultCount",
+        "value": 8,
+        "label": "Results Count",
+        "description": "Number of products to show in search results",
+        "required": false,
+        "validation": {
+          "numberMin": 2,
+          "numberMax": 20
+        }
+      }
+    ]
+  },
+  {
+    "id": "store-locator",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "googleMapsApiKey",
+        "label": "Google Maps API Key",
+        "description": "API key for Maps JavaScript API and Places API (New)",
+        "value": "",
+        "required": false
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "defaultView",
+        "label": "Default View",
+        "description": "Initial display layout for the store locator",
+        "value": "split",
+        "required": false,
+        "options": [
+          {
+            "name": "Split View (50/50)",
+            "value": "split"
+          },
+          {
+            "name": "Map Focused (Sidebar)",
+            "value": "map"
+          },
+          {
+            "name": "List Only (No Map)",
+            "value": "list"
+          }
+        ]
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "searchRadius",
+        "label": "Search Radius",
+        "description": "Default radius (set 0 for All stores)",
+        "value": 0,
+        "required": false,
+        "validation": {
+          "numberMin": 0,
+          "numberMax": 100
+        }
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "maxResults",
+        "label": "Maximum Results",
+        "description": "Maximum number of stores to display",
+        "value": 10,
+        "required": false,
+        "validation": {
+          "numberMin": 5,
+          "numberMax": 50
+        }
+      },
+      {
+        "component": "boolean",
+        "valueType": "boolean",
+        "name": "autoDetect",
+        "label": "Auto-Detect Location",
+        "description": "Automatically use browser geolocation on page load",
+        "value": true,
+        "required": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "defaultLocation",
+        "label": "Default Location",
+        "description": "Fallback location if geolocation is denied (e.g., 'Portland, OR')",
+        "value": "Portland, OR",
+        "required": false
+      },
+      {
+        "component": "multiselect",
+        "valueType": "string",
+        "name": "servicesFilter",
+        "label": "Available Service Filters",
+        "description": "Services that users can filter stores by",
+        "value": [
+          "pharmacy",
+          "pickup",
+          "delivery",
+          "24-hour",
+          "deli",
+          "bakery"
+        ],
+        "required": false,
+        "options": [
+          {
+            "name": "Pharmacy",
+            "value": "pharmacy"
+          },
+          {
+            "name": "Pickup",
+            "value": "pickup"
+          },
+          {
+            "name": "Delivery",
+            "value": "delivery"
+          },
+          {
+            "name": "24 Hour",
+            "value": "24-hour"
+          },
+          {
+            "name": "Deli",
+            "value": "deli"
+          },
+          {
+            "name": "Bakery",
+            "value": "bakery"
+          },
+          {
+            "name": "Organic",
+            "value": "organic"
+          },
+          {
+            "name": "Gas Station",
+            "value": "gas-station"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "experienceMode",
+        "label": "Experience Mode",
+        "description": "Fast = lighter payloads; Rich = photos and reviews",
+        "value": "fast",
+        "required": false,
+        "options": [
+          {
+            "name": "Fast",
+            "value": "fast"
+          },
+          {
+            "name": "Rich",
+            "value": "rich"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "radiusPresets",
+        "label": "Radius Presets",
+        "description": "Comma-separated radius options shown in the UI (example: 0,5,10,25,50)",
+        "value": "0,5,10,25,50",
+        "required": false
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "units",
+        "label": "Distance Units",
+        "description": "Unit for distance display and radius filtering",
+        "value": "miles",
+        "required": false,
+        "options": [
+          {
+            "name": "Miles",
+            "value": "miles"
+          },
+          {
+            "name": "Kilometers",
+            "value": "km"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "noResultsMessage",
+        "label": "No Results Message",
+        "description": "Message shown when no stores match current filters",
+        "value": "No stores found matching your criteria. Please try a different search or remove some filters.",
+        "required": false
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "maxReviewsPerStore",
+        "label": "Max Reviews Per Store",
+        "description": "Maximum review count to render in rich details",
+        "value": 5,
+        "required": false,
+        "validation": {
+          "numberMin": 1,
+          "numberMax": 20
+        }
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "mapStyle",
+        "label": "Map Style",
+        "description": "Map visual style (uses configured map IDs)",
+        "value": "default",
+        "required": false,
+        "options": [
+          {
+            "name": "Default",
+            "value": "default"
+          },
+          {
+            "name": "Muted",
+            "value": "muted"
+          },
+          {
+            "name": "Minimal",
+            "value": "minimal"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "primaryCtaLabel",
+        "label": "Primary CTA Label",
+        "description": "Primary action label on store cards and info window links",
+        "value": "Get Directions",
+        "required": false
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "cardDensity",
+        "label": "Store Card Density",
+        "description": "Adjust card spacing for list layout",
+        "value": "comfortable",
+        "required": false,
+        "options": [
+          {
+            "name": "Comfortable",
+            "value": "comfortable"
+          },
+          {
+            "name": "Compact",
+            "value": "compact"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "top-banner",
+    "fields": []
   }
 ]

@@ -549,6 +549,116 @@
               "type": "key-value-block"
             }
           }
+        },
+        {
+          "title": "Blog Post",
+          "id": "blog-post",
+          "model": "blog-post",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div class=\"blog-post\"><div><div><h1>Blog Post Title</h1><p>Author Name - January 1, 2025</p></div></div></div>"
+            }
+          }
+        },
+        {
+          "title": "Blog Tiles",
+          "id": "blog-tiles",
+          "plugins": {
+            "da": {
+              "unsafeHTML": "<div class=\"blog-tiles\"><div><div>blogtiles-limit</div><div>24</div></div><div><div>blogtiles-sort</div><div>newest</div></div><div><div>blogtiles-showdescription</div><div>true</div></div></div>"
+            }
+          }
+        },
+        {
+          "title": "Cards List",
+          "id": "cards-list",
+          "plugins": {
+            "da": {
+              "rows": 1,
+              "columns": 2,
+              "unsafeHTML": "<div class=\"cards-list\"><div><div><picture><img src=\"\" alt=\"\"></picture></div><div><p>Card description</p><p><a href=\"#\">Card link</a></p></div></div><div><div><picture><img src=\"\" alt=\"\"></picture></div><div><p>Card description</p><p><a href=\"#\">Card link</a></p></div></div></div>"
+            }
+          }
+        },
+        {
+          "title": "Circle Carousel",
+          "id": "circle-carousel",
+          "model": "circle-carousel",
+          "plugins": {
+            "da": {
+              "type": "key-value-block",
+              "unsafeHTML": "<div class=\"circle-carousel\"><div><div>alignment</div><div>center</div></div><div><div>autoplay</div><div>true</div></div><div><div>items-desktop</div><div>6</div></div></div>"
+            }
+          }
+        },
+        {
+          "title": "Hero CTA",
+          "id": "hero-cta",
+          "model": "hero-cta",
+          "plugins": {
+            "da": {
+              "rows": 1,
+              "columns": 1,
+              "unsafeHTML": "<div class=\"hero-cta\"><div><div><picture><img src=\"\" alt=\"Hero background image\"></picture></div><div><h1>Hero Headline</h1><p>Supporting subtitle or description.</p><p><a href=\"/page\">Primary CTA</a></p><p><a href=\"/page2\">Secondary CTA</a></p></div></div><div><div>herocta-height</div><div>tall</div></div><div><div>herocta-cta-anchor</div><div>bottom-left</div></div><div><div>interval</div><div>5000</div></div></div>"
+            }
+          }
+        },
+        {
+          "title": "Newsletter",
+          "id": "newsletter",
+          "model": "newsletter",
+          "plugins": {
+            "da": {
+              "type": "key-value-block",
+              "unsafeHTML": "<div class=\"newsletter\"><div><div>align</div><div>center</div></div><div><div>background</div><div>neutral</div></div><div><div>Sign up for updates</div></div><div><div>Get the latest news and offers.</div></div><div><div>Your email address</div></div><div><div>Subscribe</div></div><div><div>By subscribing you agree to our <a href=\"/privacy\">Privacy Policy</a>.</div></div><div><div>You're subscribed!</div></div><div><div>Thanks for signing up. Check your inbox for a confirmation.</div></div></div>"
+            }
+          }
+        },
+        {
+          "title": "Promotional Hero",
+          "id": "promotional-hero",
+          "model": "promotional-hero",
+          "plugins": {
+            "da": {
+              "rows": 1,
+              "columns": 1,
+              "unsafeHTML": "<div class=\"promotional-hero\"><div><div><picture><img src=\"\" alt=\"Campaign image\"></picture></div><div><p>Campaign description highlighting the promotion.</p></div><div><a href=\"/shop\">Shop now</a></div></div><div><div><picture><img src=\"\" alt=\"Campaign image\"></picture></div><div><p>Campaign description highlighting the promotion.</p></div><div><a href=\"/shop\">Shop now</a></div></div></div>"
+            }
+          }
+        },
+        {
+          "title": "Search Bar",
+          "id": "search-bar",
+          "model": "search-bar",
+          "plugins": {
+            "da": {
+              "type": "key-value-block",
+              "unsafeHTML": "<div class=\"search-bar\"><div><div>placeholder</div><div>Search Products</div></div><div><div>alignment</div><div>center</div></div><div><div>result-count</div><div>8</div></div></div>"
+            }
+          }
+        },
+        {
+          "title": "Store Locator",
+          "id": "store-locator",
+          "model": "store-locator",
+          "plugins": {
+            "da": {
+              "type": "key-value-block",
+              "unsafeHTML": "<div class=\"store-locator\"><div><div>google-maps-api-key</div><div></div></div><div><div>default-view</div><div>split</div></div><div><div>search-radius</div><div>0</div></div></div>"
+            }
+          }
+        },
+        {
+          "title": "Top Banner",
+          "id": "top-banner",
+          "model": "top-banner",
+          "plugins": {
+            "da": {
+              "rows": 1,
+              "columns": 1,
+              "unsafeHTML": "<div class=\"top-banner\"><div><div>Free shipping on orders over $50</div><div></div><div><a href=\"/sale\">Shop the sale</a></div><div><a href=\"/stores\">Find a store</a></div></div></div>"
+            }
+          }
         }
       ]
     },

@@ -1,0 +1,20 @@
+{
+  "definitions": [
+    {
+      "title": "Blog Tiles",
+      "id": "blog-tiles",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div class=\"blog-tiles\"><div><div><p>Category</p></div></div></div>"
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "blog-tiles",
+      "fields": []
+    }
+  ],
+  "filters": []
+}

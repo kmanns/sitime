@@ -1,0 +1,20 @@
+{
+  "definitions": [
+    {
+      "title": "Blog Post",
+      "id": "blog-post",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div class=\"blog-post\"><div><div><p>Layout</p></div></div></div>"
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "blog-post",
+      "fields": []
+    }
+  ],
+  "filters": []
+}

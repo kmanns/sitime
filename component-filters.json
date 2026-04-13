@@ -43,7 +43,8 @@
       "product-list-page",
       "product-recommendations",
       "targeted-block",
-      "text"
+      "text",
+      "blog-tiles"
     ]
   },
   {
@@ -79,6 +80,22 @@
     "components": [
       "text",
       "image"
+    ]
+  },
+  {
+    "id": "circle-carousel",
+    "components": [
+      "circle-carousel-item"
+    ]
+  },
+  {
+    "id": "search-bar",
+    "components": []
+  },
+  {
+    "id": "store-locator",
+    "components": [
+      "store-locator-item"
     ]
   }
 ]
