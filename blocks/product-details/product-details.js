@@ -119,6 +119,9 @@ export default async function decorate(block) {
 
   // State to track if we are in update mode
   let isUpdateMode = false;
+  let isPdpConfigurationValid = true;
+  let isCustomizableOptionsValid = true;
+  let addToCart;
 
   // Layout
   const fragment = document.createRange()
@@ -250,6 +253,15 @@ export default async function decorate(block) {
     // Customizable Options
     UI.render(ProductCustomizableOptions, {
       product,
+      onValidationChange: (valid) => {
+        isCustomizableOptionsValid = valid;
+        if (addToCart && !isGridOrderingView) {
+          addToCart.setProps((prev) => ({
+            ...prev,
+            disabled: !isPdpConfigurationValid || !isCustomizableOptionsValid,
+          }));
+        }
+      },
     })($customizableOptions),
 
     // Configuration - Swatches
@@ -326,7 +338,7 @@ export default async function decorate(block) {
   ]);
 
   // Configuration – Button - Add to Cart
-  const addToCart = await UI.render(Button, {
+  addToCart = await UI.render(Button, {
     children: labels.Global?.AddProductToCart,
     icon: h(Icon, { source: 'Cart' }),
     onClick: async () => {
@@ -361,6 +373,10 @@ export default async function decorate(block) {
         // get the current selection values
         const values = pdpApi.getProductConfigurationValues();
         const valid = pdpApi.isProductConfigurationValid();
+
+        if (!isCustomizableOptionsValid) {
+          throw new Error("The product's required option(s) weren't entered. Make sure the options are entered and try again.");
+        }
 
         // add or update the product in the cart
         if (valid) {
@@ -428,7 +444,7 @@ export default async function decorate(block) {
         // Re-enable button (keep disabled for Grid Ordering flow)
         addToCart.setProps((prev) => ({
           ...prev,
-          disabled: !!isGridOrderingView,
+          disabled: !!isGridOrderingView || !isPdpConfigurationValid || !isCustomizableOptionsValid,
         }));
       }
     },
@@ -439,10 +455,12 @@ export default async function decorate(block) {
     // Pdp validation not relevant for Grid Ordering flow (no options selection available)
     if (isGridOrderingView) return;
 
+    isPdpConfigurationValid = valid;
+
     // update add to cart button disabled state based on product selection validity
     addToCart.setProps((prev) => ({
       ...prev,
-      disabled: !valid,
+      disabled: !isPdpConfigurationValid || !isCustomizableOptionsValid,
     }));
   }, { eager: true });
 
