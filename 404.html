@@ -24,22 +24,16 @@
   </script>
   <script nonce="aem" type="text/javascript">
     (function routeProduct404ToTemplate() {
-      const match = window.location.pathname.match(/^\/products\/([^/]+)\/([^/?#]+)\/?$/i);
+      const match = window.location.pathname.match(/^\/products\/([^/?#]+)\/?$/i);
       if (!match) return;
 
-      const [, rawUrlKey, rawSku] = match;
+      const [, rawUrlKey] = match;
       const target = new URL('/products/default', window.location.origin);
 
       try {
         target.searchParams.set('urlKey', decodeURIComponent(rawUrlKey));
       } catch {
         target.searchParams.set('urlKey', rawUrlKey);
-      }
-
-      try {
-        target.searchParams.set('sku', decodeURIComponent(rawSku));
-      } catch {
-        target.searchParams.set('sku', rawSku);
       }
 
       const currentParams = new URLSearchParams(window.location.search);

@@ -8,6 +8,7 @@ import {
   fetchPlaceholders,
   getOptionsUIDsFromUrl,
   getProductSku,
+  getSkuFromUrlKey,
   IS_UE,
   loadErrorPage,
   preloadFile,
@@ -100,8 +101,23 @@ await initializeDropin(async () => {
   preloadPDPAssets();
 
   // Fetch product data
-  const sku = getProductSku();
+  let sku = getProductSku();
   const optionsUIDs = getOptionsUIDsFromUrl();
+
+  // If no SKU found, try to get it from URL key (from 404 redirect)
+  if (!sku) {
+    const urlKey = new URLSearchParams(window.location.search).get('urlKey');
+    if (urlKey) {
+      try {
+        const skuFromUrlKey = await getSkuFromUrlKey(urlKey);
+        if (skuFromUrlKey) {
+          sku = skuFromUrlKey;
+        }
+      } catch (error) {
+        console.error('Error resolving SKU from URL key:', error);
+      }
+    }
+  }
 
   // If we cannot find a sku, and we are not in UE, there's a problem.
   if (!sku && !IS_UE) {

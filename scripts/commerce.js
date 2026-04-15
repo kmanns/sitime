@@ -637,17 +637,24 @@ export async function commerceEndpointWithQueryParams(customHeaders = {}) {
  * @returns {string|null} The SKU extracted from the URL, or null if not found
  */
 function getSkuFromUrl() {
-  const path = window.location.pathname;
-  const result = path.match(/\/products\/[^/]+\/([^/?#]+)\/?$/);
+  // URL only contains urlKey now, not SKU
+  return null;
+}
 
-  if (!result?.[1]) {
+/**
+ * Extracts the URL key from the current URL path.
+ * @returns {string|null} The URL key extracted from the URL, or null if not found
+ */
+function getProductUrlKeyFromPath() {
+  const match = window.location.pathname.match(/^\/products\/([^/?#]+)\/?$/);
+  if (!match?.[1]) {
     return null;
   }
 
   try {
-    return decodeURIComponent(result[1]);
+    return decodeURIComponent(match[1]);
   } catch {
-    return result[1];
+    return match[1];
   }
 }
 
@@ -697,14 +704,10 @@ export function getProductLink(urlKey, sku) {
   if (!urlKey) {
     console.warn('getProductLink: urlKey is missing or empty', { urlKey, sku });
   }
-  if (!sku) {
-    console.warn('getProductLink: sku is missing or empty', { urlKey, sku });
-  }
 
   const pathUrlKey = (urlKey ?? '').toString().trim();
-  const pathSku = (sku ?? '').toString().trim();
 
-  return rootLink(`/products/${encodeURIComponent(pathUrlKey)}/${encodeURIComponent(pathSku)}`);
+  return rootLink(`/products/${encodeURIComponent(pathUrlKey)}`);
 }
 
 /**
@@ -716,7 +719,45 @@ export function getProductSku() {
     return getDefaultSkuFromBlock();
   }
 
-  return getMetadata('sku') || getSkuFromQuery() || getSkuFromUrl();
+  // Try metadata, query param, or URL key query param
+  return getMetadata('sku') || getSkuFromQuery() || getSkuFromUrlKeyParam();
+}
+
+/**
+ * Gets the URL key from query parameter if present.
+ * Used when redirected from 404.html
+ * @returns {string|null} The URL key from query parameter, or null if not found
+ */
+export async function getSkuFromUrlKey(urlKey) {
+  if (!urlKey) return null;
+
+  try {
+    // Query the Catalog Service to find product by URL key
+    const query = `query {
+      products(filter: { url_key: { eq: "${urlKey.toLowerCase()}" } }, pageSize: 1) {
+        items {
+          sku
+        }
+      }
+    }`;
+
+    const result = await CS_FETCH_GRAPHQL(query);
+    const product = result?.data?.products?.items?.[0];
+    
+    if (product?.sku) {
+      console.log(`Found SKU "${product.sku}" for URL key "${urlKey}"`);
+      return product.sku;
+    }
+  } catch (error) {
+    console.error(`Error finding product by URL key "${urlKey}":`, error);
+  }
+
+  return null;
+}
+
+function getSkuFromUrlKeyParam() {
+  const urlKey = new URLSearchParams(window.location.search).get('urlKey');
+  return urlKey ? urlKey.trim() : null;
 }
 
 /**
