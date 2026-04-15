@@ -4,6 +4,7 @@ import {
 } from '@dropins/tools/preact-hooks.js';
 import { events } from '@dropins/tools/event-bus.js';
 import * as pdpApi from '@dropins/storefront-pdp/api.js';
+import { getConfigValue } from '@dropins/tools/lib/aem/configs.js';
 import { CORE_FETCH_GRAPHQL } from '../../scripts/commerce.js';
 
 const CORE_CUSTOMIZABLE_OPTIONS_QUERY = `
@@ -205,6 +206,88 @@ function isSelectableOption(type) {
   return type === 'drop_down' || type === 'radio' || type === 'checkbox';
 }
 
+function normalizeOverrideOptions(rawOptions = []) {
+  return (Array.isArray(rawOptions) ? rawOptions : [])
+    .map((option) => {
+      const type = mapOptionType(option.type || option.__typename, option.type);
+      if (!type) return null;
+
+      const optionUid = option.uid
+        || option.id
+        || option.customizable_option_uid
+        || option.customizableOptionUid
+        || option.title
+        || option.label;
+
+      if (!optionUid) return null;
+
+      return {
+        uid: optionUid,
+        label: option.label || option.title || option.name || String(optionUid),
+        required: !!(option.required ?? option.is_required ?? option.isRequired),
+        type,
+        values: (option.values || []).map((value) => ({
+          uid: value.uid
+            || value.id
+            || value.customizable_option_value_uid
+            || value.customizableOptionValueUid
+            || value.value
+            || value.label
+            || value.title,
+          label: value.label || value.title || String(value.value || value.uid || value.id || ''),
+          price: value.price
+            ? {
+              type: value.price.type,
+              value: value.price.value,
+            }
+            : null,
+        })).filter((value) => !!value.uid),
+      };
+    })
+    .filter(Boolean);
+}
+
+function getProductAttributeOptions(product) {
+  const attributes = Array.isArray(product?.attributes) ? product.attributes : [];
+  const overrideAttribute = attributes.find((attribute) => (
+    attribute?.id === 'ac_customizable_options'
+      || attribute?.id === 'ac_customizable'
+      || attribute?.name === 'ac_customizable_options'
+      || attribute?.name === 'ac_customizable'
+  ));
+
+  if (!overrideAttribute?.value) {
+    return [];
+  }
+
+  try {
+    const parsedValue = typeof overrideAttribute.value === 'string'
+      ? JSON.parse(overrideAttribute.value)
+      : overrideAttribute.value;
+    return normalizeOverrideOptions(parsedValue?.options || parsedValue);
+  } catch (error) {
+    console.warn('Failed to parse customizable options from product attribute override:', error);
+    return [];
+  }
+}
+
+async function getConfigOverrideOptions(sku) {
+  try {
+    const configValue = await getConfigValue('commerce-customizable-options');
+    if (!configValue) return [];
+
+    const parsedConfig = typeof configValue === 'string'
+      ? JSON.parse(configValue)
+      : configValue;
+    if (!parsedConfig || typeof parsedConfig !== 'object') return [];
+
+    return normalizeOverrideOptions(parsedConfig[sku]);
+  } catch (error) {
+    console.warn('Failed to load customizable options from config override:', error);
+    return [];
+  }
+}
+
 export default function ProductCustomizableOptions({
   product = null,
   onOptionChange = () => {},
@@ -228,8 +311,7 @@ export default function ProductCustomizableOptions({
         setLoading(true);
 
         const coreEndpoint = CORE_FETCH_GRAPHQL.getConfig?.().endpoint;
-        const csEndpoint = pdpApi.getConfig?.().endpoint;
-        const shouldTryCore = !!coreEndpoint && coreEndpoint !== csEndpoint;
+        const shouldTryCore = !!coreEndpoint;
 
         if (shouldTryCore) {
           try {
@@ -259,14 +341,32 @@ export default function ProductCustomizableOptions({
         });
 
         const fallbackOptions = normalizeCsOptions(csResponse?.data?.products?.[0]?.options || []);
+        if (fallbackOptions.length > 0) {
+          setCustomizableOptions(fallbackOptions);
+          return;
+        }
+
+        const attributeOverrideOptions = getProductAttributeOptions(product);
+        if (attributeOverrideOptions.length > 0) {
+          setCustomizableOptions(attributeOverrideOptions);
+          return;
+        }
+
+        const configOverrideOptions = await getConfigOverrideOptions(product.sku);
+        if (configOverrideOptions.length > 0) {
+          setCustomizableOptions(configOverrideOptions);
+          return;
+        }
+
         if (fallbackOptions.length === 0) {
           const productType = csResponse?.data?.products?.[0]?.__typename;
           console.info('[pdp] No customizable options returned by Catalog Service', {
             sku: product.sku,
             productType,
+            note: 'Add commerce-customizable-options in config.json or ac_customizable_options attribute to provide frontend overrides.',
           });
         }
-        setCustomizableOptions(fallbackOptions);
+        setCustomizableOptions([]);
       } catch (error) {
         console.warn('Failed to fetch customizable options:', error);
         setCustomizableOptions([]);

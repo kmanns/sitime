@@ -6,10 +6,9 @@ The Product Details block provides comprehensive product detail page functionali
 
 ## Integration
 
-| Configuration Key     | Type   | Default  | Description                                                    | Required | Side Effects                                                                                                 |
-| --------------------- |--------|----------| -------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------ |
+| Configuration Key       | Type   | Default   | Description                                                    | Required | Side Effects                                                                                                 |
+| ----------------------- | ------ | --------- | -------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------ |
 | `grid-ordering-enabled` | string | `'false'` | Enables Grid Ordering functionality for configurable products. | No       | When enabled, product variants are displayed in a grid with quantity inputs and bulk add-to-cart capability. |
-
 
 ### URL Parameters
 
@@ -52,6 +51,44 @@ No events are emitted by this block. -->
 4. **Wishlist Management**: Users can add/remove products from wishlist
 5. **Image Gallery**: Users can view product images in desktop thumbnail or mobile carousel format
 6. **SEO Optimization**: Sets JSON-LD structured data and meta tags for search engines
+
+### Customizable Options Data Sources
+
+Customizable options are resolved in this order:
+
+1. Core GraphQL query (`CustomizableProductInterface`)
+2. Catalog Service product options fallback
+3. Product attribute override (`ac_customizable_options` or `ac_customizable` JSON)
+4. Site config override (`commerce-customizable-options` in `config.json`)
+
+When using overrides, each option/value must include the actual option UIDs expected by cart mutations.
+
+Example `config.json` shape:
+
+```json
+{
+  "public": {
+    "default": {
+      "commerce-customizable-options": {
+        "sit8008": [
+          {
+            "uid": "<customizable_option_uid>",
+            "label": "Package",
+            "required": true,
+            "type": "drop_down",
+            "values": [
+              {
+                "uid": "<customizable_option_value_uid>",
+                "label": "Option A"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
+```
 
 ### Error Handling
 
