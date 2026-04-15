@@ -1,0 +1,24 @@
+{
+  "data": [
+    {
+      "Key": "Global.AddProductToCart",
+      "Value": "Add to Cart"
+    },
+    {
+      "Key": "Global.UpdateProductInCart",
+      "Value": "Update in Cart"
+    },
+    {
+      "Key": "Global.AddingToCart",
+      "Value": "Adding to Cart"
+    },
+    {
+      "Key": "Global.UpdatingInCart",
+      "Value": "Updating in Cart"
+    },
+    {
+      "Key": "Global.quantityLabel",
+      "Value": "Quantity"
+    }
+  ]
+}
