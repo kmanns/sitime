@@ -27,6 +27,9 @@ import ProductAttributes from '@dropins/storefront-pdp/containers/ProductAttribu
 import ProductGallery from '@dropins/storefront-pdp/containers/ProductGallery.js';
 import ProductGiftCardOptions from '@dropins/storefront-pdp/containers/ProductGiftCardOptions.js';
 
+// Custom Components
+import ProductCustomizableOptions from './customizable-options.js';
+
 // Libs
 import {
   fetchPlaceholders, getProductLink, rootLink, setJsonLd,
@@ -131,6 +134,7 @@ export default async function decorate(block) {
         <div class="product-details__gallery"></div>
         <div class="product-details__short-description"></div>
         <div class="product-details__gift-card-options"></div>
+        <div class="product-details__customizable-options"></div>
         <div class="product-details__configuration">
           <div class="product-details__options"></div>
           <div class="product-details__quantity"></div>
@@ -153,6 +157,7 @@ export default async function decorate(block) {
   const $price = fragment.querySelector('.product-details__price');
   const $galleryMobile = fragment.querySelector('.product-details__right-column .product-details__gallery');
   const $shortDescription = fragment.querySelector('.product-details__short-description');
+  const $customizableOptions = fragment.querySelector('.product-details__customizable-options');
   const $options = fragment.querySelector('.product-details__options');
   const $quantity = fragment.querySelector('.product-details__quantity');
   const $giftCardOptions = fragment.querySelector('.product-details__gift-card-options');
@@ -194,6 +199,7 @@ export default async function decorate(block) {
     _header,
     _price,
     _shortDescription,
+    _customizableOptions,
     _options,
     _quantity,
     _giftCardOptions,
@@ -240,6 +246,11 @@ export default async function decorate(block) {
 
     // Short Description
     pdpRendered.render(ProductShortDescription, {})($shortDescription),
+
+    // Customizable Options
+    UI.render(ProductCustomizableOptions, {
+      product,
+    })($customizableOptions),
 
     // Configuration - Swatches
     !isGridOrderingView
