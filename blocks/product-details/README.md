@@ -41,14 +41,13 @@ No events are emitted by this block. -->
 - **Add Mode**: When no itemUid in URL, operates in add-to-cart mode
 - **Update Mode**: When itemUid in URL, operates in update-cart mode with different button text and behavior
 - **Product Configuration**: Validates product options and enables/disables add to cart button accordingly
-- **Customizable Options**: Renders custom options (text fields, dropdowns, checkboxes, etc.) if available on the product
 - **Wishlist Context**: Updates wishlist context based on current product configuration
 
 ### User Interaction Flows
 
-1. **Initialization**: Block renders product gallery, header, price, customizable options, configurable options, quantity, and action buttons
-2. **Product Configuration**: Users can select product options and enter customizable option values with real-time validation
-3. **Add to Cart**: Users can add products with custom options to cart or update existing cart items
+1. **Initialization**: Block renders product gallery, header, price, options, quantity, and action buttons
+2. **Product Configuration**: Users can select product options with real-time validation
+3. **Add to Cart**: Users can add products to cart or update existing cart items
 4. **Wishlist Management**: Users can add/remove products from wishlist
 5. **Image Gallery**: Users can view product images in desktop thumbnail or mobile carousel format
 6. **SEO Optimization**: Sets JSON-LD structured data and meta tags for search engines

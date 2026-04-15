@@ -125,22 +125,6 @@ fragment PRODUCT_FRAGMENT on ProductView {
     roles
   }
 
-  customizableOptions {
-    uid
-    label
-    required
-    type
-    values {
-      uid
-      label
-      price {
-        type
-        units
-        value
-      }
-    }
-  }
-
 ... on SimpleProductView {
     price {
         roles
