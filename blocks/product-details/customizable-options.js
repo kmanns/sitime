@@ -1,87 +1,30 @@
 import { h, Fragment } from '@dropins/tools/preact.js';
 import {
-  useCallback, useState, useEffect,
+  useMemo, useCallback, useState, useEffect,
 } from '@dropins/tools/preact-hooks.js';
 import { events } from '@dropins/tools/event-bus.js';
 import * as pdpApi from '@dropins/storefront-pdp/api.js';
-import { CORE_FETCH_GRAPHQL } from '../../scripts/commerce.js';
+import { CS_FETCH_GRAPHQL } from '../../scripts/commerce.js';
 
-const CORE_CUSTOMIZABLE_OPTIONS_QUERY = `
+// GraphQL Query to fetch customizable options for a product
+const CUSTOMIZABLE_OPTIONS_QUERY = `
   query GetCustomizableOptions($sku: String!) {
     products(filter: { sku: { eq: $sku } }) {
       items {
-        __typename
-        sku
-        ... on CustomizableProductInterface {
-          options {
-            __typename
-            uid
-            option_id
-            title
-            required
-            sort_order
-            ... on CustomizableDropDownOption {
-              value {
-                uid
-                option_type_id
-                title
-                sort_order
-                price
-                price_type
-              }
-            }
-            ... on CustomizableRadioOption {
-              value {
-                uid
-                option_type_id
-                title
-                sort_order
-                price
-                price_type
-              }
-            }
-            ... on CustomizableCheckboxOption {
-              value {
-                uid
-                option_type_id
-                title
-                sort_order
-                price
-                price_type
-              }
-            }
-            ... on CustomizableMultipleOption {
-              value {
-                uid
-                option_type_id
-                title
-                sort_order
-                price
-                price_type
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-const CS_OPTIONS_FALLBACK_QUERY = `
-  query GetCatalogServiceOptions($sku: String!) {
-    products(skus: [$sku]) {
-      sku
-      options {
         id
-        title
-        required
-        type
-        values {
-          id
+        sku
+        options(skipped_group_types: ["attribute", "related_products"]) {
           title
-          pricing {
-            type
-            value
+          required
+          type
+          values {
+            title
+            id
+            sku
+            pricing {
+              type
+              value
+            }
           }
         }
       }
@@ -89,76 +32,13 @@ const CS_OPTIONS_FALLBACK_QUERY = `
   }
 `;
 
-function mapOptionType(typeName = '', fallbackType = '') {
-  const source = (typeName || fallbackType || '').toLowerCase();
-
-  if (source.includes('dropdown') || source === 'drop_down' || source === 'select') return 'drop_down';
-  if (source.includes('radio')) return 'radio';
-  if (source.includes('checkbox') || source.includes('multiple')) return 'checkbox';
-  if (source.includes('field') || source === 'text') return 'text';
-  if (source.includes('area') || source === 'textarea') return 'area';
-  if (source.includes('file')) return 'file';
-  if (source.includes('date_time') || source.includes('datetime')) return 'date_time';
-  if (source.includes('date')) return 'date';
-  if (source.includes('time')) return 'time';
-
-  return '';
-}
-
-function normalizeCoreOptions(rawOptions = []) {
-  return rawOptions
-    .map((option) => {
-      const type = mapOptionType(option.__typename);
-      if (!type) return null;
-
-      return {
-        uid: option.uid || String(option.option_id),
-        label: option.title,
-        required: !!option.required,
-        type,
-        values: (option.value || []).map((value) => ({
-          uid: value.uid || String(value.option_type_id),
-          label: value.title,
-          price: value.price != null
-            ? {
-              type: value.price_type,
-              value: value.price,
-            }
-            : null,
-        })),
-      };
-    })
-    .filter(Boolean);
-}
-
-function normalizeCsOptions(rawOptions = []) {
-  return rawOptions
-    .map((option) => {
-      const type = mapOptionType('', option.type);
-      if (!type) return null;
-
-      return {
-        uid: option.id || option.title,
-        label: option.title,
-        required: !!option.required,
-        type,
-        values: (option.values || []).map((value) => ({
-          uid: value.id || value.title,
-          label: value.title,
-          price: value.pricing?.value != null
-            ? {
-              type: value.pricing.type,
-              value: value.pricing.value,
-            }
-            : null,
-        })),
-      };
-    })
-    .filter(Boolean);
-}
-
+/**
+ * Custom component for rendering Adobe Commerce customizable options
+ * Handles text fields, text areas, dropdowns, checkboxes, radio buttons, and date/time inputs
+ */
 export default function ProductCustomizableOptions({
   product = null,
+  scope = '',
   onOptionChange = () => {},
   onValidationChange = () => {},
   className = '',
@@ -168,6 +48,7 @@ export default function ProductCustomizableOptions({
   const [customizableOptions, setCustomizableOptions] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Fetch customizable options when product SKU changes
   useEffect(() => {
     if (!product?.sku) {
       setCustomizableOptions([]);
@@ -178,35 +59,37 @@ export default function ProductCustomizableOptions({
     const fetchCustomizableOptions = async () => {
       try {
         setLoading(true);
-
-        const { data, errors: coreErrors } = await CORE_FETCH_GRAPHQL.fetchGraphQl(
-          CORE_CUSTOMIZABLE_OPTIONS_QUERY,
-          {
-            method: 'GET',
-            variables: { sku: product.sku },
-          },
-        );
-
-        if (coreErrors?.length) {
-          throw new Error(coreErrors.map((error) => error.message).join('; '));
-        }
-
-        const coreOptions = normalizeCoreOptions(data?.products?.items?.[0]?.options || []);
-
-        if (coreOptions.length > 0) {
-          console.debug('[pdp] Customizable options loaded from Core GraphQL:', coreOptions.length);
-          setCustomizableOptions(coreOptions);
-          return;
-        }
-
-        const csResponse = await pdpApi.fetchGraphQl(CS_OPTIONS_FALLBACK_QUERY, {
-          method: 'GET',
+        const { data } = await CS_FETCH_GRAPHQL.query({
+          query: CUSTOMIZABLE_OPTIONS_QUERY,
           variables: { sku: product.sku },
         });
 
-        const fallbackOptions = normalizeCsOptions(csResponse?.data?.products?.[0]?.options || []);
-        console.debug('[pdp] Customizable options fallback from CS:', fallbackOptions.length);
-        setCustomizableOptions(fallbackOptions);
+        const items = data?.products?.items || [];
+        const rawOptions = items[0]?.options || [];
+        
+        // Filter out only custom text options (not configurable attributes)
+        // and normalize the data structure
+        const customOptions = rawOptions
+          .filter((opt) => 
+            ['text', 'textarea', 'file', 'select', 'radio', 'checkbox', 'date', 'time', 'datetime'].includes(opt.type?.toLowerCase())
+          )
+          .map((opt) => ({
+            uid: opt.id || opt.title, // Use id as uid, fall back to title
+            label: opt.title || opt.label,
+            required: opt.required || false,
+            type: opt.type?.toLowerCase() || 'text',
+            values: (opt.values || []).map((val) => ({
+              uid: val.id || val.title,
+              label: val.title || val.label,
+              price: val.pricing?.value ? {
+                type: val.pricing.type,
+                value: val.pricing.value,
+              } : null,
+            })).filter((val) => val.id || val.label), // Filter out empty values
+          }));
+
+        console.debug('Fetched customizable options:', customOptions);
+        setCustomizableOptions(customOptions);
       } catch (error) {
         console.warn('Failed to fetch customizable options:', error);
         setCustomizableOptions([]);
@@ -218,6 +101,7 @@ export default function ProductCustomizableOptions({
     fetchCustomizableOptions();
   }, [product?.sku]);
 
+  // Handle option value change
   const handleOptionChange = useCallback((optionUid, value) => {
     setEnteredOptions((prev) => {
       const existing = prev.findIndex((opt) => opt.uid === optionUid);
@@ -229,38 +113,44 @@ export default function ProductCustomizableOptions({
         updated = [...prev, { uid: optionUid, value }];
       }
 
+      // Update product configuration values
       const currentValues = pdpApi.getProductConfigurationValues();
       pdpApi.setProductConfigurationValues({
         ...currentValues,
         enteredOptions: updated,
       });
 
-      events.emit('pdp/values', { ...currentValues, enteredOptions: updated });
+      // Emit event for product values change
+      events.emit('pdp/values', { enteredOptions: updated });
+
       onOptionChange(optionUid, value);
       return updated;
     });
   }, [onOptionChange]);
 
+  // Validate required options
   useEffect(() => {
     const newErrors = {};
-
     customizableOptions.forEach((option) => {
-      if (!option.required) return;
-
-      const selected = enteredOptions.find((opt) => opt.uid === option.uid);
-      const hasValue = Array.isArray(selected?.value)
-        ? selected.value.length > 0
-        : !!selected?.value;
-
-      if (!hasValue) {
-        newErrors[option.uid] = `${option.label} is required`;
+      if (option.required) {
+        const hasValue = enteredOptions.some(
+          (opt) => opt.uid === option.uid && opt.value !== '',
+        );
+        if (!hasValue) {
+          newErrors[option.uid] = `${option.label} is required`;
+        }
       }
     });
-
     setErrors(newErrors);
     onValidationChange(Object.keys(newErrors).length === 0);
   }, [enteredOptions, customizableOptions, onValidationChange]);
 
+  // Return null if no customizable options
+  if (!customizableOptions.length) {
+    return null;
+  }
+
+  // Render individual option based on type
   const renderOption = (option) => {
     const currentValue = enteredOptions.find((opt) => opt.uid === option.uid)?.value || '';
     const hasError = !!errors[option.uid];
@@ -307,48 +197,56 @@ export default function ProductCustomizableOptions({
           required: option.required,
         }, [
           h('option', { value: '', disabled: true }, 'Select an option'),
-          ...(option.values || []).map((value) => h('option', { value: value.uid }, value.label)),
+          ...(option.values || []).map((val) => h('option', { value: val.uid }, val.label)),
         ]);
 
       case 'radio':
         return h('fieldset', { className: 'customizable-option__radio-group' }, [
           h('legend', {}, option.label),
-          ...(option.values || []).map((value) => h('div', { className: 'customizable-option__radio' }, [
+          ...(option.values || []).map((val) => h('div', { className: 'customizable-option__radio' }, [
             h('input', {
               type: 'radio',
-              id: `option-${option.uid}-${value.uid}`,
+              id: `option-${option.uid}-${val.uid}`,
               name: option.uid,
-              value: value.uid,
-              checked: currentValue === value.uid,
+              value: val.uid,
+              checked: currentValue === val.uid,
               onChange: (e) => handleOptionChange(option.uid, e.target.value),
               required: option.required,
             }),
-            h('label', { htmlFor: `option-${option.uid}-${value.uid}` }, value.label),
+            h('label', { htmlFor: `option-${option.uid}-${val.uid}` }, val.label),
           ])),
         ]);
 
       case 'checkbox':
-        return h('div', { className: 'customizable-option__checkbox-group' },
-          (option.values || []).map((value) => {
-            const selectedValues = Array.isArray(currentValue) ? currentValue : [];
-            const isChecked = selectedValues.includes(value.uid);
-
+        return h('div', { className: 'customizable-option__checkbox-group' }, 
+          (option.values || []).map((val) => {
+            const isChecked = Array.isArray(currentValue) 
+              ? currentValue.includes(val.uid)
+              : currentValue === val.uid;
+            
             return h('div', { className: 'customizable-option__checkbox' }, [
               h('input', {
                 type: 'checkbox',
-                id: `option-${option.uid}-${value.uid}`,
+                id: `option-${option.uid}-${val.uid}`,
                 checked: isChecked,
                 onChange: (e) => {
                   if (e.target.checked) {
-                    handleOptionChange(option.uid, [...selectedValues, value.uid]);
+                    const newValue = Array.isArray(currentValue)
+                      ? [...currentValue, val.uid]
+                      : [val.uid];
+                    handleOptionChange(option.uid, newValue);
                   } else {
-                    handleOptionChange(option.uid, selectedValues.filter((uid) => uid !== value.uid));
+                    const newValue = Array.isArray(currentValue)
+                      ? currentValue.filter((uid) => uid !== val.uid)
+                      : '';
+                    handleOptionChange(option.uid, newValue);
                   }
                 },
               }),
-              h('label', { htmlFor: `option-${option.uid}-${value.uid}` }, value.label),
+              h('label', { htmlFor: `option-${option.uid}-${val.uid}` }, val.label),
             ]);
-          }));
+          })
+        );
 
       case 'date':
         return h('input', {
@@ -382,7 +280,12 @@ export default function ProductCustomizableOptions({
     }
   };
 
-  if (loading || customizableOptions.length === 0) {
+  // Return null if loading or no customizable options
+  if (loading) {
+    return null; // Don't render while loading
+  }
+
+  if (!customizableOptions || customizableOptions.length === 0) {
     return null;
   }
 
