@@ -701,13 +701,22 @@ export function isProductTemplate() {
 }
 
 export function getProductLink(urlKey, sku) {
-  if (!urlKey) {
-    console.warn('getProductLink: urlKey is missing or empty', { urlKey, sku });
+  if (!sku) {
+    console.warn('getProductLink: sku is missing or empty', { urlKey, sku });
   }
 
-  const pathUrlKey = (urlKey ?? '').toString().trim();
+  const pathSku = (sku ?? '').toString().trim();
 
-  return rootLink(`/products/${encodeURIComponent(pathUrlKey)}`);
+  // Use query param instead of path segment since Edge Delivery doesn't support dynamic routes
+  // Format: /products.html?sku=SKU_VALUE
+  const url = new URL(rootLink('/products.html'));
+  url.searchParams.set('sku', encodeURIComponent(pathSku));
+  
+  if (urlKey) {
+    url.searchParams.set('urlKey', encodeURIComponent(urlKey));
+  }
+
+  return url.toString();
 }
 
 /**
