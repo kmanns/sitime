@@ -21,7 +21,18 @@ export default function ProductCustomizableOptions({
 
   // Get customizable options from product
   const customizableOptions = useMemo(() => {
-    if (!product?.customizableOptions?.length) return [];
+    if (!product?.customizableOptions?.length) {
+      // Debug: log when no options are found
+      if (product) {
+        console.debug('Product found but no customizableOptions:', {
+          product: product.name || product.sku,
+          hasCustomizable: !!product.customizableOptions,
+          customizableLength: product.customizableOptions?.length,
+        });
+      }
+      return [];
+    }
+    console.debug('Found customizable options:', product.customizableOptions);
     return product.customizableOptions;
   }, [product]);
 
