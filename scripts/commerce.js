@@ -706,17 +706,14 @@ export function getProductLink(urlKey, sku) {
   }
 
   const pathSku = (sku ?? '').toString().trim();
+  const pathUrlKey = (urlKey ?? '').toString().trim();
 
-  // Use query param instead of path segment since Edge Delivery doesn't support dynamic routes
-  // Format: /products.html?sku=SKU_VALUE
-  const url = new URL(rootLink('/products.html'));
-  url.searchParams.set('sku', encodeURIComponent(pathSku));
-  
-  if (urlKey) {
-    url.searchParams.set('urlKey', encodeURIComponent(urlKey));
-  }
+  // Route to the existing PDP template using query params.
+  const params = new URLSearchParams();
+  if (pathSku) params.set('sku', pathSku);
+  if (pathUrlKey) params.set('urlKey', pathUrlKey);
 
-  return url.toString();
+  return rootLink(`/products/default?${params.toString()}`);
 }
 
 /**
