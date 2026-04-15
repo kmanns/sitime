@@ -4,103 +4,6 @@ import {
 } from '@dropins/tools/preact-hooks.js';
 import { events } from '@dropins/tools/event-bus.js';
 import * as pdpApi from '@dropins/storefront-pdp/api.js';
-import { CORE_FETCH_GRAPHQL } from '../../scripts/commerce.js';
-
-const CORE_CUSTOMIZABLE_OPTIONS_QUERY = `
-  query GetCoreCustomizableOptions($sku: String!) {
-    products(filter: { sku: { eq: $sku } }) {
-      items {
-        __typename
-        sku
-        ... on CustomizableProductInterface {
-          options {
-            __typename
-            uid
-            required
-            sort_order
-            title
-            ... on CustomizableFieldOption {
-              value {
-                uid
-                sku
-                price
-                price_type
-                max_characters
-              }
-            }
-            ... on CustomizableAreaOption {
-              value {
-                uid
-                sku
-                price
-                price_type
-                max_characters
-              }
-            }
-            ... on CustomizableDateOption {
-              value {
-                uid
-                sku
-                price
-                price_type
-                type
-              }
-            }
-            ... on CustomizableFileOption {
-              value {
-                uid
-                sku
-                price
-                price_type
-                file_extension
-              }
-            }
-            ... on CustomizableDropDownOption {
-              value {
-                uid
-                option_type_id
-                title
-                sort_order
-                price
-                price_type
-              }
-            }
-            ... on CustomizableRadioOption {
-              value {
-                uid
-                option_type_id
-                title
-                sort_order
-                price
-                price_type
-              }
-            }
-            ... on CustomizableCheckboxOption {
-              value {
-                uid
-                option_type_id
-                title
-                sort_order
-                price
-                price_type
-              }
-            }
-            ... on CustomizableMultipleOption {
-              value {
-                uid
-                option_type_id
-                title
-                sort_order
-                price
-                price_type
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
 
 const CS_OPTIONS_FALLBACK_QUERY = `
   query GetCatalogServiceOptions($sku: String!) {
@@ -167,40 +70,6 @@ function normalizeCsOptions(rawOptions = []) {
     .filter(Boolean);
 }
 
-function normalizeCoreOptions(rawOptions = []) {
-  return rawOptions.map((option) => {
-    const type = mapOptionType(option.__typename);
-    if (!type) return null;
-
-    if (type === 'text' || type === 'area' || type === 'date' || type === 'date_time' || type === 'time' || type === 'file') {
-      return {
-        uid: option.uid,
-        label: option.title,
-        required: !!option.required,
-        type,
-        values: [],
-      };
-    }
-
-    return {
-      uid: option.uid,
-      label: option.title,
-      required: !!option.required,
-      type,
-      values: (option.value || []).map((value) => ({
-        uid: value.uid,
-        label: value.title,
-        price: value.price != null
-          ? {
-            type: value.price_type,
-            value: value.price,
-          }
-          : null,
-      })),
-    };
-  }).filter(Boolean);
-}
-
 function isSelectableOption(type) {
   return type === 'drop_down' || type === 'radio' || type === 'checkbox';
 }
@@ -226,32 +95,6 @@ export default function ProductCustomizableOptions({
     const fetchCustomizableOptions = async () => {
       try {
         setLoading(true);
-
-        const coreEndpoint = CORE_FETCH_GRAPHQL.getConfig?.().endpoint;
-        const csEndpoint = pdpApi.getConfig?.().endpoint;
-        const shouldTryCore = !!coreEndpoint && coreEndpoint !== csEndpoint;
-
-        if (shouldTryCore) {
-          try {
-            const coreResponse = await CORE_FETCH_GRAPHQL.fetchGraphQl(
-              CORE_CUSTOMIZABLE_OPTIONS_QUERY,
-              {
-                method: 'GET',
-                variables: { sku: product.sku },
-              },
-            );
-
-            if (!coreResponse?.errors?.length) {
-              const coreOptions = normalizeCoreOptions(coreResponse?.data?.products?.items?.[0]?.options || []);
-              if (coreOptions.length > 0) {
-                setCustomizableOptions(coreOptions);
-                return;
-              }
-            }
-          } catch (coreError) {
-            console.warn('Failed to fetch customizable options from core endpoint:', coreError);
-          }
-        }
 
         const csResponse = await pdpApi.fetchGraphQl(CS_OPTIONS_FALLBACK_QUERY, {
           method: 'GET',
@@ -314,11 +157,11 @@ export default function ProductCustomizableOptions({
         nextEnteredOptions.push({ uid: optionUid, value });
       }
 
-      pdpApi.setProductConfigurationValues(() => ({
+      pdpApi.setProductConfigurationValues({
         ...currentValues,
         optionsUIDs: nextOptionsUIDs,
         enteredOptions: nextEnteredOptions,
-      }));
+      });
 
       events.emit('pdp/values', {
         ...currentValues,
