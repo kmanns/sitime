@@ -70,10 +70,6 @@ function normalizeCsOptions(rawOptions = []) {
     .filter(Boolean);
 }
 
-function isSelectableOption(type) {
-  return type === 'drop_down' || type === 'radio' || type === 'checkbox';
-}
-
 export default function ProductCustomizableOptions({
   product = null,
   onOptionChange = () => {},
@@ -121,9 +117,7 @@ export default function ProductCustomizableOptions({
     fetchCustomizableOptions();
   }, [product?.sku]);
 
-  const handleOptionChange = useCallback((option, value) => {
-    const optionUid = option.uid;
-
+  const handleOptionChange = useCallback((optionUid, value) => {
     setEnteredOptions((prev) => {
       const existing = prev.findIndex((opt) => opt.uid === optionUid);
       let updated;
@@ -134,41 +128,13 @@ export default function ProductCustomizableOptions({
         updated = [...prev, { uid: optionUid, value }];
       }
 
-      const currentValues = pdpApi.getProductConfigurationValues() || {};
-      const existingOptionsUIDs = Array.isArray(currentValues.optionsUIDs)
-        ? currentValues.optionsUIDs
-        : [];
-      const existingEnteredOptions = Array.isArray(currentValues.enteredOptions)
-        ? currentValues.enteredOptions
-        : [];
-
-      // Remove previous selections for this option before applying the new one.
-      const valueUIDsForOption = new Set((option.values || []).map((item) => item.uid));
-      const nextOptionsUIDs = existingOptionsUIDs.filter((uid) => !valueUIDsForOption.has(uid));
-
-      const nextEnteredOptions = existingEnteredOptions.filter((item) => item.uid !== optionUid);
-
-      if (isSelectableOption(option.type)) {
-        const selectedUIDs = Array.isArray(value)
-          ? value.filter(Boolean)
-          : value ? [value] : [];
-        nextOptionsUIDs.push(...selectedUIDs);
-      } else if (value !== null && value !== undefined && value !== '') {
-        nextEnteredOptions.push({ uid: optionUid, value });
-      }
-
+      const currentValues = pdpApi.getProductConfigurationValues();
       pdpApi.setProductConfigurationValues({
         ...currentValues,
-        optionsUIDs: nextOptionsUIDs,
-        enteredOptions: nextEnteredOptions,
+        enteredOptions: updated,
       });
 
-      events.emit('pdp/values', {
-        ...currentValues,
-        optionsUIDs: nextOptionsUIDs,
-        enteredOptions: nextEnteredOptions,
-      });
-
+      events.emit('pdp/values', { ...currentValues, enteredOptions: updated });
       onOptionChange(optionUid, value);
       return updated;
     });
@@ -205,7 +171,7 @@ export default function ProductCustomizableOptions({
           className: `customizable-option__input ${hasError ? 'customizable-option__input--error' : ''}`,
           placeholder: option.label,
           value: currentValue,
-          onChange: (e) => handleOptionChange(option, e.target.value),
+          onChange: (e) => handleOptionChange(option.uid, e.target.value),
           required: option.required,
         });
 
@@ -214,7 +180,7 @@ export default function ProductCustomizableOptions({
           className: `customizable-option__textarea ${hasError ? 'customizable-option__textarea--error' : ''}`,
           placeholder: option.label,
           value: currentValue,
-          onChange: (e) => handleOptionChange(option, e.target.value),
+          onChange: (e) => handleOptionChange(option.uid, e.target.value),
           required: option.required,
           rows: 4,
         });
@@ -226,7 +192,7 @@ export default function ProductCustomizableOptions({
           onChange: (e) => {
             const file = e.target.files?.[0];
             if (file) {
-              handleOptionChange(option, file.name);
+              handleOptionChange(option.uid, file.name);
             }
           },
           required: option.required,
@@ -236,7 +202,7 @@ export default function ProductCustomizableOptions({
         return h('select', {
           className: `customizable-option__select ${hasError ? 'customizable-option__select--error' : ''}`,
           value: currentValue,
-          onChange: (e) => handleOptionChange(option, e.target.value),
+          onChange: (e) => handleOptionChange(option.uid, e.target.value),
           required: option.required,
         }, [
           h('option', { value: '', disabled: true }, 'Select an option'),
@@ -253,7 +219,7 @@ export default function ProductCustomizableOptions({
               name: option.uid,
               value: value.uid,
               checked: currentValue === value.uid,
-              onChange: (e) => handleOptionChange(option, e.target.value),
+              onChange: (e) => handleOptionChange(option.uid, e.target.value),
               required: option.required,
             }),
             h('label', { htmlFor: `option-${option.uid}-${value.uid}` }, value.label),
@@ -273,9 +239,9 @@ export default function ProductCustomizableOptions({
                 checked: isChecked,
                 onChange: (e) => {
                   if (e.target.checked) {
-                    handleOptionChange(option, [...selectedValues, value.uid]);
+                    handleOptionChange(option.uid, [...selectedValues, value.uid]);
                   } else {
-                    handleOptionChange(option, selectedValues.filter((uid) => uid !== value.uid));
+                    handleOptionChange(option.uid, selectedValues.filter((uid) => uid !== value.uid));
                   }
                 },
               }),
@@ -288,7 +254,7 @@ export default function ProductCustomizableOptions({
           type: 'date',
           className: `customizable-option__input ${hasError ? 'customizable-option__input--error' : ''}`,
           value: currentValue,
-          onChange: (e) => handleOptionChange(option, e.target.value),
+          onChange: (e) => handleOptionChange(option.uid, e.target.value),
           required: option.required,
         });
 
@@ -297,7 +263,7 @@ export default function ProductCustomizableOptions({
           type: 'time',
           className: `customizable-option__input ${hasError ? 'customizable-option__input--error' : ''}`,
           value: currentValue,
-          onChange: (e) => handleOptionChange(option, e.target.value),
+          onChange: (e) => handleOptionChange(option.uid, e.target.value),
           required: option.required,
         });
 
@@ -306,7 +272,7 @@ export default function ProductCustomizableOptions({
           type: 'datetime-local',
           className: `customizable-option__input ${hasError ? 'customizable-option__input--error' : ''}`,
           value: currentValue,
-          onChange: (e) => handleOptionChange(option, e.target.value),
+          onChange: (e) => handleOptionChange(option.uid, e.target.value),
           required: option.required,
         });
 
