@@ -4,6 +4,33 @@ import {
 } from '@dropins/tools/preact-hooks.js';
 import { events } from '@dropins/tools/event-bus.js';
 import * as pdpApi from '@dropins/storefront-pdp/api.js';
+import { CS_FETCH_GRAPHQL } from '../../scripts/commerce.js';
+
+// GraphQL Query to fetch customizable options for a product
+const CUSTOMIZABLE_OPTIONS_QUERY = `
+  query GetCustomizableOptions($sku: String!) {
+    products(filter: { sku: { eq: $sku } }) {
+      items {
+        id
+        sku
+        options(skipped_group_types: ["attribute", "related_products"]) {
+          title
+          required
+          type
+          values {
+            title
+            id
+            sku
+            pricing {
+              type
+              value
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 
 /**
  * Custom component for rendering Adobe Commerce customizable options
@@ -18,23 +45,61 @@ export default function ProductCustomizableOptions({
 }) {
   const [enteredOptions, setEnteredOptions] = useState([]);
   const [errors, setErrors] = useState({});
+  const [customizableOptions, setCustomizableOptions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Get customizable options from product
-  const customizableOptions = useMemo(() => {
-    if (!product?.customizableOptions?.length) {
-      // Debug: log when no options are found
-      if (product) {
-        console.debug('Product found but no customizableOptions:', {
-          product: product.name || product.sku,
-          hasCustomizable: !!product.customizableOptions,
-          customizableLength: product.customizableOptions?.length,
-        });
-      }
-      return [];
+  // Fetch customizable options when product SKU changes
+  useEffect(() => {
+    if (!product?.sku) {
+      setCustomizableOptions([]);
+      setLoading(false);
+      return;
     }
-    console.debug('Found customizable options:', product.customizableOptions);
-    return product.customizableOptions;
-  }, [product]);
+
+    const fetchCustomizableOptions = async () => {
+      try {
+        setLoading(true);
+        const { data } = await CS_FETCH_GRAPHQL.query({
+          query: CUSTOMIZABLE_OPTIONS_QUERY,
+          variables: { sku: product.sku },
+        });
+
+        const items = data?.products?.items || [];
+        const rawOptions = items[0]?.options || [];
+        
+        // Filter out only custom text options (not configurable attributes)
+        // and normalize the data structure
+        const customOptions = rawOptions
+          .filter((opt) => 
+            ['text', 'textarea', 'file', 'select', 'radio', 'checkbox', 'date', 'time', 'datetime'].includes(opt.type?.toLowerCase())
+          )
+          .map((opt) => ({
+            uid: opt.id || opt.title, // Use id as uid, fall back to title
+            label: opt.title || opt.label,
+            required: opt.required || false,
+            type: opt.type?.toLowerCase() || 'text',
+            values: (opt.values || []).map((val) => ({
+              uid: val.id || val.title,
+              label: val.title || val.label,
+              price: val.pricing?.value ? {
+                type: val.pricing.type,
+                value: val.pricing.value,
+              } : null,
+            })).filter((val) => val.id || val.label), // Filter out empty values
+          }));
+
+        console.debug('Fetched customizable options:', customOptions);
+        setCustomizableOptions(customOptions);
+      } catch (error) {
+        console.warn('Failed to fetch customizable options:', error);
+        setCustomizableOptions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomizableOptions();
+  }, [product?.sku]);
 
   // Handle option value change
   const handleOptionChange = useCallback((optionUid, value) => {
@@ -214,6 +279,15 @@ export default function ProductCustomizableOptions({
         return null;
     }
   };
+
+  // Return null if loading or no customizable options
+  if (loading) {
+    return null; // Don't render while loading
+  }
+
+  if (!customizableOptions || customizableOptions.length === 0) {
+    return null;
+  }
 
   return h('div', { className: `customizable-options ${className}` }, [
     h('fieldset', { className: 'customizable-options__fieldset' }, [
