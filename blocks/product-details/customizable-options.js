@@ -4,72 +4,11 @@ import {
 } from '@dropins/tools/preact-hooks.js';
 import { events } from '@dropins/tools/event-bus.js';
 import * as pdpApi from '@dropins/storefront-pdp/api.js';
-import { CORE_FETCH_GRAPHQL } from '../../scripts/commerce.js';
-
-const CORE_CUSTOMIZABLE_OPTIONS_QUERY = `
-  query GetCustomizableOptions($sku: String!) {
-    products(filter: { sku: { eq: $sku } }) {
-      items {
-        __typename
-        sku
-        ... on CustomizableProductInterface {
-          options {
-            __typename
-            uid
-            option_id
-            title
-            required
-            sort_order
-            ... on CustomizableDropDownOption {
-              value {
-                uid
-                option_type_id
-                title
-                sort_order
-                price
-                price_type
-              }
-            }
-            ... on CustomizableRadioOption {
-              value {
-                uid
-                option_type_id
-                title
-                sort_order
-                price
-                price_type
-              }
-            }
-            ... on CustomizableCheckboxOption {
-              value {
-                uid
-                option_type_id
-                title
-                sort_order
-                price
-                price_type
-              }
-            }
-            ... on CustomizableMultipleOption {
-              value {
-                uid
-                option_type_id
-                title
-                sort_order
-                price
-                price_type
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
 
 const CS_OPTIONS_FALLBACK_QUERY = `
   query GetCatalogServiceOptions($sku: String!) {
     products(skus: [$sku]) {
+      __typename
       sku
       options {
         id
@@ -103,32 +42,6 @@ function mapOptionType(typeName = '', fallbackType = '') {
   if (source.includes('time')) return 'time';
 
   return '';
-}
-
-function normalizeCoreOptions(rawOptions = []) {
-  return rawOptions
-    .map((option) => {
-      const type = mapOptionType(option.__typename);
-      if (!type) return null;
-
-      return {
-        uid: option.uid || String(option.option_id),
-        label: option.title,
-        required: !!option.required,
-        type,
-        values: (option.value || []).map((value) => ({
-          uid: value.uid || String(value.option_type_id),
-          label: value.title,
-          price: value.price != null
-            ? {
-              type: value.price_type,
-              value: value.price,
-            }
-            : null,
-        })),
-      };
-    })
-    .filter(Boolean);
 }
 
 function normalizeCsOptions(rawOptions = []) {
@@ -179,33 +92,19 @@ export default function ProductCustomizableOptions({
       try {
         setLoading(true);
 
-        const { data, errors: coreErrors } = await CORE_FETCH_GRAPHQL.fetchGraphQl(
-          CORE_CUSTOMIZABLE_OPTIONS_QUERY,
-          {
-            method: 'GET',
-            variables: { sku: product.sku },
-          },
-        );
-
-        if (coreErrors?.length) {
-          throw new Error(coreErrors.map((error) => error.message).join('; '));
-        }
-
-        const coreOptions = normalizeCoreOptions(data?.products?.items?.[0]?.options || []);
-
-        if (coreOptions.length > 0) {
-          console.debug('[pdp] Customizable options loaded from Core GraphQL:', coreOptions.length);
-          setCustomizableOptions(coreOptions);
-          return;
-        }
-
         const csResponse = await pdpApi.fetchGraphQl(CS_OPTIONS_FALLBACK_QUERY, {
           method: 'GET',
           variables: { sku: product.sku },
         });
 
         const fallbackOptions = normalizeCsOptions(csResponse?.data?.products?.[0]?.options || []);
-        console.debug('[pdp] Customizable options fallback from CS:', fallbackOptions.length);
+        if (fallbackOptions.length === 0) {
+          const productType = csResponse?.data?.products?.[0]?.__typename;
+          console.info('[pdp] No customizable options returned by Catalog Service', {
+            sku: product.sku,
+            productType,
+          });
+        }
         setCustomizableOptions(fallbackOptions);
       } catch (error) {
         console.warn('Failed to fetch customizable options:', error);
