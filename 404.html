@@ -22,6 +22,36 @@
     window.isErrorPage = true;
     window.errorCode = '404';
   </script>
+  <script nonce="aem" type="text/javascript">
+    (function routeProduct404ToTemplate() {
+      const match = window.location.pathname.match(/^\/products\/([^/]+)\/([^/?#]+)\/?$/i);
+      if (!match) return;
+
+      const [, rawUrlKey, rawSku] = match;
+      const target = new URL('/products/default', window.location.origin);
+
+      try {
+        target.searchParams.set('urlKey', decodeURIComponent(rawUrlKey));
+      } catch {
+        target.searchParams.set('urlKey', rawUrlKey);
+      }
+
+      try {
+        target.searchParams.set('sku', decodeURIComponent(rawSku));
+      } catch {
+        target.searchParams.set('sku', rawSku);
+      }
+
+      const currentParams = new URLSearchParams(window.location.search);
+      currentParams.forEach((value, key) => {
+        if (!target.searchParams.has(key)) {
+          target.searchParams.append(key, value);
+        }
+      });
+
+      window.location.replace(target.toString());
+    }());
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta property="og:title" content="Page not found">
   <script nonce="aem" type="module">

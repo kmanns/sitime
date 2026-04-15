@@ -17,26 +17,6 @@ import {
 import initializeDropins from './initializers/index.js';
 
 /**
- * Sanitizes the given string by:
- * - convert to lower case
- * - normalize all unicode characters
- * - replace all non-alphanumeric characters with a dash
- * - remove all consecutive dashes
- * - remove all leading and trailing dashes
- *
- * @param {string} name
- * @returns {string} sanitized name
- */
-function sanitizeName(name) {
-  return name
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
-}
-
-/**
  * Fetch GraphQL Instances
  */
 
@@ -658,8 +638,26 @@ export async function commerceEndpointWithQueryParams(customHeaders = {}) {
  */
 function getSkuFromUrl() {
   const path = window.location.pathname;
-  const result = path.match(/\/products\/[\w|-]+\/([\w|-]+)$/);
-  return result?.[1];
+  const result = path.match(/\/products\/[^/]+\/([^/?#]+)\/?$/);
+
+  if (!result?.[1]) {
+    return null;
+  }
+
+  try {
+    return decodeURIComponent(result[1]);
+  } catch {
+    return result[1];
+  }
+}
+
+/**
+ * Extracts the SKU from the current URL query params.
+ * @returns {string|null} The SKU extracted from the query string, or null if not found
+ */
+function getSkuFromQuery() {
+  const sku = new URLSearchParams(window.location.search).get('sku');
+  return sku ? sku.trim() : null;
 }
 
 /**
@@ -702,9 +700,11 @@ export function getProductLink(urlKey, sku) {
   if (!sku) {
     console.warn('getProductLink: sku is missing or empty', { urlKey, sku });
   }
-  const sanitizedUrlKey = urlKey ? sanitizeName(urlKey) : '';
-  const sanitizedSku = sku ? sanitizeName(sku) : '';
-  return rootLink(`/products/${sanitizedUrlKey}/${sanitizedSku}`);
+
+  const pathUrlKey = (urlKey ?? '').toString().trim();
+  const pathSku = (sku ?? '').toString().trim();
+
+  return rootLink(`/products/${encodeURIComponent(pathUrlKey)}/${encodeURIComponent(pathSku)}`);
 }
 
 /**
@@ -716,7 +716,7 @@ export function getProductSku() {
     return getDefaultSkuFromBlock();
   }
 
-  return getMetadata('sku') || getSkuFromUrl();
+  return getMetadata('sku') || getSkuFromQuery() || getSkuFromUrl();
 }
 
 /**
