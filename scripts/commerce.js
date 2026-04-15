@@ -728,84 +728,8 @@ export function getProductSku() {
     return getDefaultSkuFromBlock();
   }
 
-  // Try metadata or query param only - NOT url key param
-  // URL key param should be resolved to actual SKU separately in pdp initializer
+  // Try metadata or query param - query param comes from product links with ?sku=
   return getMetadata('sku') || getSkuFromQuery();
-}
-
-/**
- * Gets the URL key from query parameter if present.
- * Used when redirected from 404.html
- * @returns {string|null} The URL key from query parameter, or null if not found
- */
-export async function getSkuFromUrlKey(urlKey) {
-  if (!urlKey) return null;
-
-  try {
-    // Escape the URL key for GraphQL string value
-    const escapedUrlKey = urlKey.toLowerCase().replace(/"/g, '\\"');
-    
-    // Use productSearch with phrase to find product by URL key
-    // Using search is more reliable than attribute filtering in Catalog Service
-    const query = `query {
-      productSearch(
-        phrase: "${escapedUrlKey}"
-        current_page: 1
-        page_size: 1
-      ) {
-        items {
-          productView {
-            id
-            sku
-            name
-            urlKey
-          }
-        }
-        total_count
-      }
-    }`;
-
-    console.log(`🔍 Searching for product with URL key: "${urlKey}"`);
-    
-    const result = await CS_FETCH_GRAPHQL(query);
-    
-    // Check for errors in the GraphQL response
-    if (result?.errors) {
-      console.error(`GraphQL Error finding product for URL key "${urlKey}":`, result.errors);
-      return null;
-    }
-    
-    const items = result?.data?.productSearch?.items || [];
-    let product = null;
-    
-    if (items.length > 0) {
-      // Find product with matching urlKey (in case search returns multiple results)
-      product = items.find(item => 
-        item?.productView?.urlKey?.toLowerCase() === urlKey.toLowerCase()
-      )?.productView;
-      
-      if (!product) {
-        // If no exact match, just use first result
-        product = items[0]?.productView;
-      }
-    }
-    
-    if (product?.sku) {
-      console.log(`✓ Found SKU "${product.sku}" for URL key "${product.urlKey}"`);
-      return product.sku;
-    }
-    
-    console.warn(`⚠ No product found for URL key "${urlKey}". Search returned ${items.length} items.`);
-  } catch (error) {
-    console.error(`✗ Error finding product for URL key "${urlKey}":`, error.message);
-  }
-
-  return null;
-}
-
-function getSkuFromUrlKeyParam() {
-  const urlKey = new URLSearchParams(window.location.search).get('urlKey');
-  return urlKey ? urlKey.trim() : null;
 }
 
 /**
