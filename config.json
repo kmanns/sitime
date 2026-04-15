@@ -3,8 +3,6 @@
     "default": {
       "commerce-core-endpoint": "https://na1-sandbox.api.commerce.adobe.com/NGqWb1jCB8UhohMLshMAHd/graphql",
       "commerce-endpoint": "https://na1-sandbox.api.commerce.adobe.com/NGqWb1jCB8UhohMLshMAHd/graphql",
-      "adobe-commerce-optimizer": false,
-      "commerce-b2b-enabled": false,
       "commerce-assets-enabled": true,
       "headers": {
         "all": {
