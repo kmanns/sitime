@@ -39,6 +39,39 @@ import '../../scripts/initializers/cart.js';
 import '../../scripts/initializers/wishlist.js';
 import '../../scripts/initializers/quick-order.js';
 
+const encodeCustomOption = (...parts) => btoa(`custom-option/${parts.join('/')}`);
+
+const HIDDEN_CUSTOM_OPTION_FALLBACKS = {
+  sit8008: {
+    frequency: {
+      id: 1,
+      label: 'Frequency',
+      maxLength: 6,
+      placeholder: 'Enter frequency',
+    },
+    selections: [
+      {
+        id: 2,
+        label: 'Frequency Stability',
+        values: [
+          { id: 2, label: '+-20' },
+          { id: 3, label: '+-25' },
+          { id: 4, label: '+-50' },
+        ],
+      },
+      {
+        id: 3,
+        label: 'Supply Voltage',
+        values: [
+          { id: 5, label: '1.8V' },
+          { id: 6, label: '2.5-3.3V' },
+          { id: 7, label: '1.8-3.3V' },
+        ],
+      },
+    ],
+  },
+};
+
 /**
  * Checks if the page has prerendered product JSON-LD data
  * @returns {boolean} True if product JSON-LD exists and contains @type=Product
@@ -96,6 +129,127 @@ function updateAddToCartButtonText(
   }
 }
 
+function getHiddenCustomOptionFallback(product) {
+  if (!product?.sku || product?.options?.length) {
+    return null;
+  }
+
+  return HIDDEN_CUSTOM_OPTION_FALLBACKS[product.sku] || null;
+}
+
+function renderHiddenCustomOptionsFallback(container, product, fallback) {
+  if (!container || !product || !fallback) return null;
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'product-details__hidden-options';
+
+  const frequencyField = document.createElement('label');
+  frequencyField.className = 'product-details__hidden-options-field';
+
+  const frequencyLabel = document.createElement('span');
+  frequencyLabel.className = 'product-details__hidden-options-label';
+  frequencyLabel.textContent = fallback.frequency.label;
+
+  const frequencyInput = document.createElement('input');
+  frequencyInput.className = 'product-details__hidden-options-input';
+  frequencyInput.type = 'text';
+  frequencyInput.inputMode = 'decimal';
+  frequencyInput.maxLength = fallback.frequency.maxLength;
+  frequencyInput.placeholder = fallback.frequency.placeholder;
+  frequencyInput.required = true;
+
+  frequencyField.append(frequencyLabel, frequencyInput);
+  wrapper.appendChild(frequencyField);
+
+  const selects = fallback.selections.map((selection) => {
+    const field = document.createElement('label');
+    field.className = 'product-details__hidden-options-field';
+
+    const label = document.createElement('span');
+    label.className = 'product-details__hidden-options-label';
+    label.textContent = selection.label;
+
+    const select = document.createElement('select');
+    select.className = 'product-details__hidden-options-select';
+    select.required = true;
+
+    const emptyOption = document.createElement('option');
+    emptyOption.value = '';
+    emptyOption.textContent = `Select ${selection.label}`;
+    select.appendChild(emptyOption);
+
+    selection.values.forEach((value) => {
+      const option = document.createElement('option');
+      option.value = value.id;
+      option.textContent = value.label;
+      select.appendChild(option);
+    });
+
+    field.append(label, select);
+    wrapper.appendChild(field);
+
+    return {
+      id: selection.id,
+      select,
+    };
+  });
+
+  container.replaceChildren(wrapper);
+
+  const getValues = () => {
+    const frequency = frequencyInput.value.trim();
+    const selectedValues = selects
+      .map(({ id, select }) => ({
+        id,
+        value: select.value,
+      }))
+      .filter(({ value }) => value);
+
+    return {
+      enteredOptions: frequency
+        ? [{
+          uid: encodeCustomOption(fallback.frequency.id),
+          value: frequency,
+        }]
+        : [],
+      optionsUIDs: selectedValues.map(({ id, value }) => encodeCustomOption(id, value)),
+    };
+  };
+
+  const isValid = () => {
+    if (!frequencyInput.value.trim()) {
+      return false;
+    }
+
+    return selects.every(({ select }) => !!select.value);
+  };
+
+  const sync = () => {
+    const { enteredOptions, optionsUIDs } = getValues();
+
+    pdpApi.setProductConfigurationValues((prev) => ({
+      ...prev,
+      sku: product.sku,
+      enteredOptions,
+      optionsUIDs,
+    }));
+    pdpApi.setProductConfigurationValid(() => isValid());
+  };
+
+  [frequencyInput, ...selects.map(({ select }) => select)].forEach((input) => {
+    input.addEventListener('input', sync);
+    input.addEventListener('change', sync);
+  });
+
+  sync();
+
+  return {
+    isValid,
+    getValues,
+    frequencyInput,
+  };
+}
+
 export default async function decorate(block) {
   const eventProduct = events.lastPayload('pdp/data') ?? null;
   // bug: the pdp sends an object with event data even if product is not found.
@@ -103,6 +257,7 @@ export default async function decorate(block) {
 
   const { 'grid-ordering-enabled': gridOrderingEnabledString = 'false' } = readBlockConfig(block);
   const gridOrderingEnabled = gridOrderingEnabledString === 'true';
+  const hiddenCustomOptionsFallback = getHiddenCustomOptionFallback(product);
 
   // Grid Ordering B2B feature (Quick Order Drop-in) - enabled only for Configurable Products
   const isGridOrderingView = gridOrderingEnabled && product?.productType === 'complex' && !product?.isBundle;
@@ -313,6 +468,9 @@ export default async function decorate(block) {
       product,
     })($wishlistToggleBtn),
   ]);
+  const hiddenCustomOptions = hiddenCustomOptionsFallback && !isGridOrderingView
+    ? renderHiddenCustomOptionsFallback($options, product, hiddenCustomOptionsFallback)
+    : null;
 
   // Configuration – Button - Add to Cart
   const addToCart = await UI.render(Button, {
@@ -349,16 +507,26 @@ export default async function decorate(block) {
 
         // get the current selection values
         const values = pdpApi.getProductConfigurationValues();
-        const valid = pdpApi.isProductConfigurationValid();
+        const fallbackValues = hiddenCustomOptions?.getValues();
+        const valid = hiddenCustomOptions
+          ? hiddenCustomOptions.isValid()
+          : pdpApi.isProductConfigurationValid();
 
         // add or update the product in the cart
         if (valid) {
+          const payload = hiddenCustomOptions
+            ? {
+              ...values,
+              ...fallbackValues,
+            }
+            : values;
+
           if (isUpdateMode) {
             // --- Update existing item ---
             const { updateProductsFromCart } = await import('@dropins/storefront-cart/api.js');
 
             await updateProductsFromCart([{
-              ...values,
+              ...payload,
               uid: itemUidFromUrl,
             }]);
 
@@ -382,7 +550,10 @@ export default async function decorate(block) {
           }
           // --- Add new item ---
           const { addProductsToCart } = await import('@dropins/storefront-cart/api.js');
-          await addProductsToCart([{ ...values }]);
+          await addProductsToCart([{ ...payload }]);
+        } else if (hiddenCustomOptions) {
+          hiddenCustomOptions.frequencyInput.focus();
+          throw new Error('Please complete all required options.');
         }
 
         // reset any previous alerts if successful
