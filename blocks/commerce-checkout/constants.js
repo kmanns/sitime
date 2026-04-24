@@ -13,6 +13,7 @@ const ADDRESS_INPUT_DEBOUNCE_TIME = 500;
 
 // Block and styling constants
 const CHECKOUT_BLOCK = 'checkout__block';
+const CHECKOUT_AGREEMENT_CLASS = 'checkout-agreement';
 const CHECKOUT_ERROR_CLASS = 'checkout__content--error';
 const CHECKOUT_HEADER_CLASS = 'checkout-header';
 const ORDER_CONFIRMATION_BLOCK = 'order-confirmation__block';
@@ -32,6 +33,7 @@ export {
 
   // Block and styling constants
   CHECKOUT_BLOCK,
+  CHECKOUT_AGREEMENT_CLASS,
   CHECKOUT_ERROR_CLASS,
   CHECKOUT_HEADER_CLASS,
 

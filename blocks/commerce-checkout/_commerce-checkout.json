@@ -5,11 +5,83 @@
     "model": "commerce-checkout",
     "plugins": {
       "da": {
-        "rows": 1,
-        "columns": 2
+        "type": "key-value-block"
       }
     }
   }],
-  "models": [],
+  "models": [{
+    "id": "commerce-checkout",
+    "fields": [
+      {
+        "component": "boolean",
+        "name": "agreement-enabled",
+        "label": "Enable checkout agreement gate"
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "agreement-display-mode",
+        "value": "inline",
+        "label": "Agreement display mode",
+        "options": [
+          {
+            "name": "Inline",
+            "value": "inline"
+          },
+          {
+            "name": "Modal",
+            "value": "modal"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "agreement-service-base-url",
+        "label": "App Builder service base URL"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "agreement-template-id",
+        "label": "Agreement template ID"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "agreement-create-path",
+        "value": "/agreements",
+        "label": "Create agreement path"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "agreement-status-path",
+        "value": "/agreements/{agreementId}",
+        "label": "Agreement status path"
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "agreement-poll-interval",
+        "value": 5000,
+        "label": "Agreement status poll interval (ms)"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "agreement-title",
+        "value": "Signature required before placing your order",
+        "label": "Agreement title"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "agreement-description",
+        "value": "Review and sign the required agreement to continue checkout.",
+        "label": "Agreement description"
+      }
+    ]
+  }],
   "filters": []
 }

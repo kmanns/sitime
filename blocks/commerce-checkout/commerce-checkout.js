@@ -21,10 +21,13 @@ import { PaymentMethodCode } from '@dropins/storefront-payment-services/api.js';
 
 // Block Utilities
 import { getConfigValue } from '@dropins/tools/lib/aem/configs.js';
+import { readBlockConfig } from '../../scripts/aem.js';
 import { buildOrderDetailsUrl, displayOverlaySpinner, removeOverlaySpinner } from './utils.js';
 
 // Fragment functions
 import { createCheckoutFragment, selectors } from './fragments.js';
+import { createAgreementController, normalizeAgreementConfig } from './agreement.js';
+import { renderAgreementGate } from './agreement-ui.js';
 
 // Container functions
 import {
@@ -82,6 +85,7 @@ function redirectToCartIfEmpty(cartData) {
 export default async function decorate(block) {
   const isB2BEnabled = getConfigValue('commerce-b2b-enabled');
   const permissions = events.lastPayload('auth/permissions');
+  const agreementConfig = normalizeAgreementConfig(readBlockConfig(block));
 
   let b2bPoApi = null;
   let b2bIsPoEnabled = false;
@@ -144,21 +148,63 @@ export default async function decorate(block) {
   const $billingForm = getElement(selectors.checkout.billingForm);
   const $orderSummary = getElement(selectors.checkout.orderSummary);
   const $cartSummary = getElement(selectors.checkout.cartSummary);
+  const $agreement = getElement(selectors.checkout.agreement);
   const $placeOrder = getElement(selectors.checkout.placeOrder);
   const $giftOptions = getElement(selectors.checkout.giftOptions);
   const $termsAndConditions = getElement(selectors.checkout.termsAndConditions);
 
+  block.textContent = '';
   block.appendChild(checkoutFragment);
 
-  const handleValidation = () => validateForms([
-    { name: LOGIN_FORM_NAME },
-    { name: SHIPPING_FORM_NAME, ref: shippingFormRef },
-    { name: BILLING_FORM_NAME, ref: billingFormRef },
-    { name: PURCHASE_ORDER_FORM_NAME },
-    { name: TERMS_AND_CONDITIONS_FORM_NAME },
-  ]);
+  let latestCartData = cartData;
+  let latestCheckoutData = events.lastPayload('checkout/initialized') || null;
+  let placeOrderApi;
 
-  const handlePlaceOrder = async ({ cartId, code }) => {
+  const agreementController = createAgreementController(agreementConfig);
+  const agreementGate = renderAgreementGate($agreement, {
+    controller: agreementController,
+    getContext: () => ({
+      cartData: latestCartData,
+      checkoutData: latestCheckoutData,
+    }),
+  });
+
+  const updatePlaceOrderState = () => {
+    if (!placeOrderApi?.setProps) return;
+    placeOrderApi.setProps({
+      disabled: agreementController.config.enabled && !agreementController.getState().signed,
+    });
+  };
+
+  agreementController.subscribe(() => {
+    updatePlaceOrderState();
+  });
+
+  const handleValidation = async () => {
+    const formsValid = validateForms([
+      { name: LOGIN_FORM_NAME },
+      { name: SHIPPING_FORM_NAME, ref: shippingFormRef },
+      { name: BILLING_FORM_NAME, ref: billingFormRef },
+      { name: PURCHASE_ORDER_FORM_NAME },
+      { name: TERMS_AND_CONDITIONS_FORM_NAME },
+    ]);
+
+    if (!formsValid) return false;
+    return agreementController.validate({
+      cartData: latestCartData,
+      checkoutData: latestCheckoutData,
+    });
+  };
+
+  const handlePlaceOrder = async ({ cartId, code, quoteId }) => {
+    const agreementValid = await agreementController.validate({
+      cartId,
+      quoteId,
+      cartData: latestCartData,
+      checkoutData: latestCheckoutData,
+    });
+    if (!agreementValid) return;
+
     await displayOverlaySpinner(loaderRef, $loader);
     try {
       // Payment Services credit card
@@ -191,7 +237,12 @@ export default async function decorate(block) {
   };
 
   // First, render the place order component
-  await renderPlaceOrder($placeOrder, { handleValidation, handlePlaceOrder, b2bIsPoEnabled });
+  placeOrderApi = await renderPlaceOrder($placeOrder, {
+    handleValidation,
+    handlePlaceOrder,
+    b2bIsPoEnabled,
+  });
+  updatePlaceOrderState();
 
   // Render the remaining containers
   const [
@@ -298,7 +349,22 @@ export default async function decorate(block) {
 
   async function handleCheckoutUpdated(data) {
     if (!data) return;
+    latestCheckoutData = data;
+    await agreementController.syncWithContext({
+      cartData: latestCartData,
+      checkoutData: latestCheckoutData,
+    });
+    updatePlaceOrderState();
     await initializeCheckout(data);
+  }
+
+  function handleCartUpdated(data) {
+    latestCartData = data;
+    redirectToCartIfEmpty(data);
+    agreementController.syncWithContext({
+      cartData: latestCartData,
+      checkoutData: latestCheckoutData,
+    }).catch(console.error);
   }
 
   function handleAuthenticated(authenticated) {
@@ -325,6 +391,7 @@ export default async function decorate(block) {
     // Clear address form data
     sessionStorage.removeItem(SHIPPING_ADDRESS_DATA_KEY);
     sessionStorage.removeItem(BILLING_ADDRESS_DATA_KEY);
+    agreementController.clear();
 
     const url = buildOrderDetailsUrl(orderData);
 
@@ -337,6 +404,7 @@ export default async function decorate(block) {
     // Clear address form data
     sessionStorage.removeItem(SHIPPING_ADDRESS_DATA_KEY);
     sessionStorage.removeItem(BILLING_ADDRESS_DATA_KEY);
+    agreementController.clear();
 
     const url = rootLink(`${CUSTOMER_PO_DETAILS_PATH}?poRef=${poData?.uid}`);
 
@@ -352,7 +420,7 @@ export default async function decorate(block) {
   events.on('checkout/updated', handleCheckoutUpdated);
   events.on('checkout/values', handleCheckoutValues);
   events.on('order/placed', handleOrderPlaced);
-  events.on('cart/initialized', redirectToCartIfEmpty, { eager: true });
-  events.on('cart/data', redirectToCartIfEmpty);
+  events.on('cart/initialized', handleCartUpdated, { eager: true });
+  events.on('cart/data', handleCartUpdated);
   events.on('purchase-order/placed', handlePurchaseOrderPlaced);
 }
