@@ -1,0 +1,13 @@
+application:
+  runtimeManifest:
+    packages:
+      sitime-checkout:
+        license: Apache-2.0
+        actions:
+          agreements:
+            function: actions/agreements/index.js
+            web: 'yes'
+            runtime: 'nodejs:20'
+            annotations:
+              require-adobe-auth: false
+              final: true

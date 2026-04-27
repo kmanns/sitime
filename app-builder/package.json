@@ -1,0 +1,13 @@
+{
+  "name": "sitime-agreements-app-builder",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "aio app deploy",
+    "undeploy": "aio app undeploy",
+    "logs": "aio app logs"
+  },
+  "devDependencies": {
+    "@adobe/aio-cli": "^10.0.0"
+  }
+}
