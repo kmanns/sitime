@@ -88,6 +88,9 @@ export default async function decorate(block) {
   const permissions = events.lastPayload('auth/permissions');
   const agreementConfig = normalizeAgreementConfig(readBlockConfig(block));
 
+  // Toggle to true once Acrobat Sign is configured and ready to use
+  const AGREEMENT_GATE_ENABLED = false;
+
   let b2bPoApi = null;
   let b2bIsPoEnabled = false;
   let b2bRenderPoSuccess = null;
@@ -162,7 +165,11 @@ export default async function decorate(block) {
   if (!isAlreadyAccepted()) {
     $wrapper.classList.add('checkout__wrapper--tc-pending');
     renderTcGate($tcGate, {
-      onAccept: () => $wrapper.classList.remove('checkout__wrapper--tc-pending'),
+      onAccept: () => {
+        $wrapper.classList.remove('checkout__wrapper--tc-pending');
+        const checkoutData = events.lastPayload('checkout/initialized');
+        if (checkoutData) handleCheckoutUpdated(checkoutData);
+      },
     });
   } else {
     $tcGate.remove();
@@ -172,7 +179,11 @@ export default async function decorate(block) {
   let latestCheckoutData = events.lastPayload('checkout/initialized') || null;
   let placeOrderApi;
 
-  const agreementController = createAgreementController(agreementConfig);
+  const resolvedAgreementConfig = { ...agreementConfig, enabled: AGREEMENT_GATE_ENABLED && agreementConfig.enabled };
+  if (!resolvedAgreementConfig.enabled) {
+    sessionStorage.removeItem('commerce-checkout-agreement');
+  }
+  const agreementController = createAgreementController(resolvedAgreementConfig);
   const agreementGate = renderAgreementGate($agreement, {
     controller: agreementController,
     getContext: () => ({
