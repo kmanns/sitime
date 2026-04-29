@@ -9,6 +9,7 @@ import { CHECKOUT_BLOCK } from './constants.js';
  */
 export const selectors = Object.freeze({
   checkout: {
+    wrapper: '.checkout__wrapper',
     content: '.checkout__content',
     loader: '.checkout__loader',
     mergedCartBanner: '.checkout__merged-cart-banner',
@@ -16,6 +17,7 @@ export const selectors = Object.freeze({
     serverError: '.checkout__server-error',
     outOfStock: '.checkout__out-of-stock',
     login: '.checkout__login',
+    tcGate: '.checkout__tc-gate',
     shippingForm: '.checkout__shipping-form',
     billToShipping: '.checkout__bill-to-shipping',
     delivery: '.checkout__delivery',
@@ -47,6 +49,7 @@ export function createCheckoutFragment() {
       <div class="checkout__content">
         <div class="checkout__merged-cart-banner"></div>
         <div class="checkout__main">
+          <div class="checkout__tc-gate ${CHECKOUT_BLOCK}"></div>
           <div class="checkout__heading ${CHECKOUT_BLOCK}"></div>
           <div class="checkout__server-error ${CHECKOUT_BLOCK}"></div>
           <div class="checkout__out-of-stock ${CHECKOUT_BLOCK}"></div>

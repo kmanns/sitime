@@ -28,6 +28,7 @@ import { buildOrderDetailsUrl, displayOverlaySpinner, removeOverlaySpinner } fro
 import { createCheckoutFragment, selectors } from './fragments.js';
 import { createAgreementController, normalizeAgreementConfig } from './agreement.js';
 import { renderAgreementGate } from './agreement-ui.js';
+import { renderTcGate, isAlreadyAccepted } from './tc-gate.js';
 
 // Container functions
 import {
@@ -134,6 +135,7 @@ export default async function decorate(block) {
   const getElement = createScopedSelector(checkoutFragment);
 
   // Get all checkout elements using centralized selectors
+  const $wrapper = getElement(selectors.checkout.wrapper);
   const $content = getElement(selectors.checkout.content);
   const $loader = getElement(selectors.checkout.loader);
   const $mergedCartBanner = getElement(selectors.checkout.mergedCartBanner);
@@ -148,6 +150,7 @@ export default async function decorate(block) {
   const $billingForm = getElement(selectors.checkout.billingForm);
   const $orderSummary = getElement(selectors.checkout.orderSummary);
   const $cartSummary = getElement(selectors.checkout.cartSummary);
+  const $tcGate = getElement(selectors.checkout.tcGate);
   const $agreement = getElement(selectors.checkout.agreement);
   const $placeOrder = getElement(selectors.checkout.placeOrder);
   const $giftOptions = getElement(selectors.checkout.giftOptions);
@@ -155,6 +158,15 @@ export default async function decorate(block) {
 
   block.textContent = '';
   block.appendChild(checkoutFragment);
+
+  if (!isAlreadyAccepted()) {
+    $wrapper.classList.add('checkout__wrapper--tc-pending');
+    renderTcGate($tcGate, {
+      onAccept: () => $wrapper.classList.remove('checkout__wrapper--tc-pending'),
+    });
+  } else {
+    $tcGate.remove();
+  }
 
   let latestCartData = cartData;
   let latestCheckoutData = events.lastPayload('checkout/initialized') || null;

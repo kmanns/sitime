@@ -80,6 +80,7 @@
 .checkout__content--error .checkout__merged-cart-banner,
 .checkout__content--error .checkout__out-of-stock,
 .checkout__content--error .checkout__login,
+.checkout__content--error .checkout__tc-gate,
 .checkout__content--error .checkout__shipping-form,
 .checkout__content--error .checkout__bill-to-shipping,
 .checkout__content--error .checkout__delivery,
@@ -379,5 +380,122 @@
 
     .checkout__place-order {
         margin-top: 0;
+    }
+}
+
+/* =========================================================
+   TC Gate — pending state hides everything except the gate
+   ========================================================= */
+.checkout__wrapper--tc-pending .checkout__main > :not(.checkout__tc-gate),
+.checkout__wrapper--tc-pending .checkout__aside {
+    display: none !important;
+}
+
+/* TC Gate component */
+.checkout-tc-gate {
+    border: var(--shape-border-width-2) solid var(--color-neutral-300);
+    border-radius: var(--shape-border-radius-4);
+    background: var(--color-neutral-50);
+    overflow: hidden;
+}
+
+.checkout-tc-gate__body {
+    max-height: 28rem;
+    overflow-y: auto;
+    padding: var(--spacing-medium) var(--spacing-big);
+    border-bottom: var(--shape-border-width-2) solid var(--color-neutral-300);
+}
+
+.checkout-tc-gate__title {
+    margin: 0 0 var(--spacing-xsmall) 0;
+    font: var(--type-headline-1-strong-font);
+    letter-spacing: var(--type-headline-1-strong-letter-spacing);
+    color: var(--color-neutral-900);
+}
+
+.checkout-tc-gate__effective {
+    margin: 0 0 var(--spacing-medium) 0;
+    color: var(--color-neutral-600);
+    font: var(--type-body-2-default-font);
+    letter-spacing: var(--type-body-2-default-letter-spacing);
+}
+
+.checkout-tc-gate__body h3 {
+    margin: var(--spacing-medium) 0 var(--spacing-xsmall) 0;
+    font: var(--type-body-1-strong-font);
+    letter-spacing: var(--type-body-1-strong-letter-spacing);
+    color: var(--color-neutral-900);
+}
+
+.checkout-tc-gate__body p {
+    margin: 0 0 var(--spacing-xsmall) 0;
+    color: var(--color-neutral-800);
+    font: var(--type-body-2-default-font);
+    letter-spacing: var(--type-body-2-default-letter-spacing);
+}
+
+.checkout-tc-gate__body ul {
+    margin: 0 0 var(--spacing-small) 0;
+    padding-left: var(--spacing-big);
+}
+
+.checkout-tc-gate__body li {
+    margin-bottom: var(--spacing-xsmall);
+    color: var(--color-neutral-800);
+    font: var(--type-body-2-default-font);
+    letter-spacing: var(--type-body-2-default-letter-spacing);
+}
+
+.checkout-tc-gate__body a {
+    color: var(--color-brand-700);
+}
+
+.checkout-tc-gate__footer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-medium);
+    padding: var(--spacing-medium) var(--spacing-big);
+    background: var(--color-neutral-100);
+}
+
+.checkout-tc-gate__label {
+    display: flex;
+    gap: var(--spacing-small);
+    align-items: flex-start;
+    cursor: pointer;
+    color: var(--color-neutral-800);
+    font: var(--type-body-2-default-font);
+    letter-spacing: var(--type-body-2-default-letter-spacing);
+}
+
+.checkout-tc-gate__checkbox {
+    flex-shrink: 0;
+    margin-top: 0.2em;
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+    accent-color: var(--color-brand-700);
+}
+
+.checkout-tc-gate__button {
+    align-self: flex-start;
+    border: 0;
+    border-radius: var(--shape-border-radius-2);
+    padding: 0.875rem 1.25rem;
+    background: var(--color-brand-700);
+    color: var(--color-neutral-50);
+    font: var(--type-body-2-strong-font);
+    letter-spacing: var(--type-body-2-strong-letter-spacing);
+    cursor: pointer;
+}
+
+.checkout-tc-gate__button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+@media only screen and (min-width: 320px) and (max-width: 768px) {
+    .checkout__tc-gate {
+        order: 0;
     }
 }
