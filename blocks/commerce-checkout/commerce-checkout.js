@@ -91,6 +91,9 @@ export default async function decorate(block) {
   // Toggle to true once Acrobat Sign is configured and ready to use
   const AGREEMENT_GATE_ENABLED = false;
 
+  // TC acceptance is intentionally not persisted — the gate must appear on every checkout visit
+  sessionStorage.removeItem('commerce-checkout-tc-accepted');
+
   let b2bPoApi = null;
   let b2bIsPoEnabled = false;
   let b2bRenderPoSuccess = null;

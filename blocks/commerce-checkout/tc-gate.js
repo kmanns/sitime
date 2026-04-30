@@ -1,4 +1,4 @@
-const TC_SESSION_KEY = 'commerce-checkout-tc-accepted';
+let tcAccepted = false;
 
 const TC_HTML = `
 <h2 class="checkout-tc-gate__title">SiTime – End-Use and End-User Certification</h2>
@@ -88,7 +88,7 @@ const TC_HTML = `
 `;
 
 export function isAlreadyAccepted() {
-  return sessionStorage.getItem(TC_SESSION_KEY) === 'true';
+  return tcAccepted;
 }
 
 export function renderTcGate(container, { onAccept }) {
@@ -131,7 +131,7 @@ export function renderTcGate(container, { onAccept }) {
 
   button.addEventListener('click', () => {
     if (!checkbox.checked) return;
-    sessionStorage.setItem(TC_SESSION_KEY, 'true');
+    tcAccepted = true;
     wrapper.remove();
     onAccept();
   });
