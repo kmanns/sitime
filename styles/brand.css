@@ -1,0 +1,16 @@
+:root {
+  --heading-font-family: "Ubuntu", helvetica, arial, verdana, sans-serif;
+  --body-font-family: "Ubuntu", helvetica, arial, verdana, sans-serif;
+  --background-color: rgb(255, 255, 255);
+  --text-color: rgb(89, 89, 89);
+  --link-color: rgb(63, 117, 166);
+  --link-hover-color: rgb(185, 11, 46);
+  --section-padding: 80px;
+  --nav-height: 123px;
+  --color-brand-red: rgb(185, 11, 46);
+  --color-brand-blue: rgb(63, 117, 166);
+  --color-brand-dark: rgb(30, 30, 30);
+  --color-light-gray: rgb(247, 247, 247);
+}
+
+html, body { overflow: auto !important; }

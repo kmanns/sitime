@@ -1,0 +1,204 @@
+/* Footer Navigation Block */
+.footer-nav-wrapper {
+  max-width: 100% !important;
+  padding: 0 !important;
+}
+
+.footer-nav {
+  --footer-bg: #595959;
+  --footer-title-color: #aed8ef;
+  --footer-link-color: #fff;
+  --footer-legal-color: #dedede;
+  --footer-border-color: #777;
+  --footer-max-width: 1325px;
+
+  background: var(--footer-bg);
+  color: var(--footer-link-color);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Row 1: Link columns */
+.footer-nav > div:first-child {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px 16px;
+  max-width: var(--footer-max-width);
+  margin: 0 auto;
+  padding: 50px 20px 40px;
+}
+
+@media (min-width: 900px) {
+  .footer-nav > div:first-child {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
+    padding: 50px 32px 40px;
+  }
+}
+
+/* Column headings */
+.footer-nav > div:first-child h3 {
+  font-size: 15px;
+  font-weight: 400;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+
+.footer-nav > div:first-child h3 a {
+  color: var(--footer-title-color) !important;
+  text-decoration: none;
+  font-weight: 400;
+}
+
+.footer-nav > div:first-child h3 a:hover {
+  text-decoration: underline;
+}
+
+/* Column lists */
+.footer-nav > div:first-child ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer-nav > div:first-child li {
+  margin: 0 0 5px;
+  line-height: 1.7;
+}
+
+.footer-nav > div:first-child li a {
+  color: var(--footer-link-color) !important;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 300;
+}
+
+.footer-nav > div:first-child li a:hover {
+  text-decoration: underline;
+}
+
+/* Row 2: Contact + Social */
+.footer-nav > div:nth-child(2) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px 32px;
+  max-width: var(--footer-max-width);
+  margin: 0 auto;
+  padding: 10px 20px 20px;
+}
+
+@media (min-width: 900px) {
+  .footer-nav > div:nth-child(2) {
+    padding: 10px 32px 20px;
+  }
+}
+
+.footer-nav > div:nth-child(2) > div:first-child p {
+  margin: 0;
+  display: inline;
+}
+
+.footer-nav > div:nth-child(2) > div:last-child p {
+  margin: 0;
+}
+
+.footer-nav > div:nth-child(2) p {
+  margin: 0;
+}
+
+.footer-nav > div:nth-child(2) a {
+  color: var(--footer-link-color) !important;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 300;
+  margin-right: 16px;
+}
+
+.footer-nav > div:nth-child(2) a:hover {
+  text-decoration: underline;
+}
+
+/* Row 3: Legal/Copyright bar */
+.footer-nav > div:nth-child(3) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 24px;
+  max-width: var(--footer-max-width);
+  margin: 0 auto;
+  padding: 16px 20px 24px;
+  border-top: 1px solid var(--footer-border-color);
+}
+
+@media (min-width: 900px) {
+  .footer-nav > div:nth-child(3) {
+    padding: 16px 32px 24px;
+  }
+}
+
+.footer-nav > div:nth-child(3) p {
+  margin: 0;
+  color: var(--footer-legal-color);
+  font-size: 12px;
+  font-weight: 300;
+}
+
+.footer-nav > div:nth-child(3) a {
+  color: var(--footer-legal-color) !important;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 300;
+  margin-right: 16px;
+}
+
+.footer-nav > div:nth-child(3) a:hover {
+  text-decoration: underline;
+}
+
+/* Button overrides — reset EDS button styling for footer links */
+main .footer-nav .button-container { display: inline; }
+main .footer-nav a.button:any-link {
+  background: none;
+  border: none;
+  color: var(--footer-link-color);
+  font-size: inherit;
+  font-weight: inherit;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  text-decoration: none;
+  white-space: normal;
+  display: inline;
+  border-radius: 0;
+}
+
+main .footer-nav a.button:any-link:hover {
+  background: none;
+  text-decoration: underline;
+}
+
+/* Footer-level button reset (footer fragment context) */
+footer .footer-nav .button-container { display: inline; }
+footer .footer-nav a.button:any-link {
+  background: none;
+  border: none;
+  color: var(--footer-link-color);
+  font-size: inherit;
+  font-weight: inherit;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  text-decoration: none;
+  white-space: normal;
+  display: inline;
+  border-radius: 0;
+}
+
+footer .footer-nav a.button:any-link:hover {
+  background: none;
+  text-decoration: underline;
+}

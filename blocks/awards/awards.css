@@ -1,0 +1,97 @@
+.awards-wrapper {
+  max-width: 1330px !important;
+  margin: 0 auto;
+  padding: 0 20px !important;
+}
+
+.awards {
+  --awards-text-color: #595959;
+  --awards-title-color: #000;
+  --awards-link-color: #2b76aa;
+  --awards-gap: 30px;
+  --awards-logo-width: 81px;
+  --awards-logo-margin: 29px;
+}
+
+/* Grid layout for the 3 award items (rows = items) */
+.awards > div {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--awards-logo-margin);
+  margin-bottom: 16px;
+}
+
+/* Logo cell */
+.awards > div > div:first-child {
+  flex-shrink: 0;
+  width: var(--awards-logo-width);
+}
+
+.awards > div > div:first-child p {
+  margin: 0;
+}
+
+.awards > div > div:first-child img {
+  width: var(--awards-logo-width);
+  height: auto;
+  display: block;
+}
+
+/* Text cell */
+.awards > div > div:last-child {
+  flex: 1;
+}
+
+.awards > div > div:last-child p {
+  margin: 0 0 4px;
+  font: normal normal 700 1.2rem/1.6rem var(--type-base-font-family, sans-serif);
+  color: var(--awards-text-color);
+}
+
+.awards > div > div:last-child p:nth-child(2) {
+  font: normal normal 400 1.6rem/2.4rem var(--type-base-font-family, sans-serif);
+  color: var(--awards-title-color);
+  margin-bottom: 8px;
+}
+
+.awards > div > div:last-child p:last-child {
+  font: normal normal 400 1.4rem/2rem var(--type-base-font-family, sans-serif);
+  margin-bottom: 0;
+}
+
+/* Reset EDS button styling for "Learn More" links */
+main .awards .button-container {
+  display: inline;
+  margin: 0;
+}
+
+main .awards a.button:any-link {
+  background: none;
+  border: none;
+  color: var(--awards-link-color);
+  font: normal normal 400 1.4rem/2rem var(--type-base-font-family, sans-serif);
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  text-decoration: none;
+  white-space: normal;
+  display: inline;
+}
+
+main .awards a.button:any-link:hover {
+  background: none;
+  text-decoration: underline;
+  color: var(--awards-link-color);
+}
+
+@media (width >= 900px) {
+  .awards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--awards-gap);
+  }
+
+  .awards > div {
+    margin-bottom: 0;
+  }
+}

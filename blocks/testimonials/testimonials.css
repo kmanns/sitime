@@ -1,0 +1,118 @@
+.testimonials-wrapper {
+  max-width: 100% !important;
+  padding: 0 !important;
+}
+
+.testimonials {
+  --testimonials-padding: 60px 24px;
+  --testimonials-quote-font-size: 28px;
+  --testimonials-quote-line-height: 40px;
+  --testimonials-attribution-font-size: 16px;
+  --testimonials-logo-height: 60px;
+
+  position: relative;
+  padding: var(--testimonials-padding);
+  text-align: center;
+  overflow: hidden;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.testimonials .testimonials-track {
+  display: flex;
+  transition: transform 0.4s ease;
+}
+
+.testimonials .testimonials-slide {
+  min-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 60px;
+  box-sizing: border-box;
+}
+
+.testimonials .testimonials-slide .slide-logo {
+  margin-bottom: 20px;
+}
+
+.testimonials .testimonials-slide .slide-logo img {
+  max-height: var(--testimonials-logo-height);
+  width: auto;
+  object-fit: contain;
+}
+
+.testimonials .testimonials-slide .slide-quote {
+  max-width: 850px;
+  margin: 0 auto 16px;
+}
+
+.testimonials .testimonials-slide .slide-quote p {
+  font-size: var(--testimonials-quote-font-size);
+  line-height: var(--testimonials-quote-line-height);
+  font-weight: 400;
+  color: #000;
+  margin: 0;
+  font-family: Ubuntu, "Open Sans", helvetica, arial, sans-serif;
+}
+
+.testimonials .testimonials-slide .slide-attribution p {
+  font-size: var(--testimonials-attribution-font-size);
+  line-height: 1.5;
+  color: #000;
+  margin: 0;
+  font-weight: 400;
+}
+
+.testimonials .testimonials-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: #666;
+  z-index: 2;
+  padding: 0;
+}
+
+.testimonials .testimonials-nav:hover {
+  color: #000;
+}
+
+.testimonials .testimonials-nav.prev {
+  left: 16px;
+}
+
+.testimonials .testimonials-nav.next {
+  right: 16px;
+}
+
+@media (max-width: 899px) {
+  .testimonials {
+    --testimonials-padding: 48px 16px;
+    --testimonials-quote-font-size: 20px;
+    --testimonials-quote-line-height: 30px;
+  }
+
+  .testimonials .testimonials-slide {
+    padding: 0 40px;
+  }
+
+  .testimonials .testimonials-nav.prev {
+    left: 4px;
+  }
+
+  .testimonials .testimonials-nav.next {
+    right: 4px;
+  }
+}

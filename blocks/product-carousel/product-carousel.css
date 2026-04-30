@@ -1,0 +1,232 @@
+/* Product Carousel Block */
+.product-carousel {
+  --carousel-card-width: 440px;
+  --carousel-gap: 30px;
+  --carousel-link-color: #3f75a6;
+  --carousel-text-color: #595959;
+  --carousel-heading-color: #000;
+}
+
+/* Header row */
+.product-carousel .carousel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.product-carousel .carousel-header h2 {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 40px;
+  color: var(--carousel-heading-color);
+  margin: 0 0 8px;
+}
+
+.product-carousel .carousel-header .subtitle {
+  font-size: 20px;
+  line-height: 32px;
+  color: var(--carousel-text-color);
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.product-carousel .carousel-header .subtitle a {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 16px;
+  line-height: 18px;
+  color: var(--carousel-link-color);
+  text-transform: uppercase;
+  text-decoration: none;
+  font-weight: 400;
+}
+
+.product-carousel .carousel-header .subtitle a:hover {
+  text-decoration: underline;
+}
+
+.product-carousel .carousel-header .subtitle a::after {
+  content: ' \2192';
+}
+
+/* Reset EDS button styles on "Shop Now" link */
+main .product-carousel .carousel-header .subtitle a.button:any-link {
+  background: none;
+  border: none;
+  color: var(--carousel-link-color);
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 18px;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  display: inline;
+}
+
+main .product-carousel .carousel-header .subtitle .button-container {
+  display: inline;
+}
+
+/* Browse All Products button */
+main .product-carousel .browse-all a.button:any-link {
+  background-color: var(--carousel-link-color);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+  padding: 15px 30px;
+  border-radius: 0;
+  border: none;
+  text-decoration: none;
+  white-space: nowrap;
+  margin: 0;
+}
+
+main .product-carousel .browse-all a.button:any-link:hover {
+  background-color: #2c5a85;
+}
+
+/* Navigation arrows */
+.product-carousel .carousel-nav {
+  display: flex;
+  gap: 20px;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.product-carousel .carousel-nav button {
+  width: 48px;
+  height: 40px;
+  background: #fff;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #333;
+  padding: 0;
+  transition: opacity 0.2s;
+}
+
+.product-carousel .carousel-nav button:hover {
+  background: #f5f5f5;
+}
+
+.product-carousel .carousel-nav button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Carousel track container */
+.product-carousel .carousel-track-container {
+  overflow: hidden;
+  position: relative;
+  margin-top: 8px;
+}
+
+.product-carousel .carousel-track {
+  display: flex;
+  gap: var(--carousel-gap);
+  transition: transform 0.4s ease;
+}
+
+/* Card styles */
+.product-carousel .carousel-card {
+  flex: 0 0 var(--carousel-card-width);
+  max-width: var(--carousel-card-width);
+}
+
+.product-carousel .carousel-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.product-carousel .carousel-card h3 {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--carousel-heading-color);
+  margin: 0 0 15px;
+  padding: 0 16px;
+}
+
+.product-carousel .carousel-card p {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--carousel-text-color);
+  margin: 0 0 24px;
+  padding: 0 16px;
+}
+
+.product-carousel .carousel-card ul {
+  list-style: none;
+  padding: 0 16px;
+  margin: 0;
+}
+
+.product-carousel .carousel-card li {
+  margin-bottom: 12px;
+}
+
+.product-carousel .carousel-card li a {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 16px;
+  line-height: 18px;
+  color: var(--carousel-link-color);
+  text-transform: uppercase;
+  text-decoration: none;
+  font-weight: 400;
+}
+
+.product-carousel .carousel-card li a:hover {
+  text-decoration: underline;
+}
+
+.product-carousel .carousel-card li a::after {
+  content: ' \2192';
+  margin-left: 4px;
+}
+
+/* Reset EDS button decoration on card links */
+main .product-carousel .carousel-card a.button:any-link {
+  background: none;
+  border: none;
+  color: var(--carousel-link-color);
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 18px;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: normal;
+  display: inline;
+}
+
+main .product-carousel .carousel-card .button-container {
+  display: inline;
+}
+
+/* Responsive */
+@media (max-width: 899px) {
+  .product-carousel {
+    --carousel-card-width: 300px;
+  }
+
+  .product-carousel .carousel-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+}

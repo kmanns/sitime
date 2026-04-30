@@ -1,37 +1,191 @@
-.hero-container .hero-wrapper {
-  max-width: unset;
-  padding: 0;
+/* Hero Block */
+.hero-wrapper {
+  max-width: 100% !important;
+  padding: 0 !important;
 }
 
 .hero {
+  --hero-bg: #1a1a2e;
+  --hero-text: #ffffff;
+  --hero-cta-bg: #ba0c2f;
+  --hero-cta-text: #ffffff;
+  --hero-ai-bg: #1f3951;
+  --hero-ai-border: #23527f;
+  --hero-notify-bg: #ffffff;
+  --hero-notify-text: #000000;
+
   position: relative;
-  padding: 40px 24px;
-  min-height: 300px;
+  background: var(--hero-bg);
+  color: var(--hero-text);
+  overflow: hidden;
 }
 
-.hero h1 {
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  color: var(--background-color);
+/* Row 1: Main hero with image + text overlay */
+.hero > div:first-child {
+  position: relative;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
 }
 
-.hero picture {
+.hero > div:first-child > div:first-child {
   position: absolute;
-  z-index: -1;
   inset: 0;
-  object-fit: cover;
-  box-sizing: border-box;
+  z-index: 0;
 }
 
-.hero img {
-  object-fit: cover;
+.hero > div:first-child > div:first-child picture,
+.hero > div:first-child > div:first-child img {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hero > div:first-child > div:last-child {
+  position: relative;
+  z-index: 1;
+  max-width: 955px;
+  padding: 80px 40px 120px;
+}
+
+.hero > div:first-child > div:last-child h1 {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: clamp(40px, 5vw, 80px);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--hero-text);
+  margin: 0 0 30px;
+}
+
+main .hero > div:first-child > div:last-child .button-container {
+  display: block;
+}
+
+main .hero > div:first-child > div:last-child a.button:any-link {
+  background: var(--hero-cta-bg);
+  color: var(--hero-cta-text);
+  border: none;
+  border-radius: 0;
+  padding: 15px 30px;
+  font-size: 16px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+main .hero > div:first-child > div:last-child a.button:any-link:hover {
+  background: #8a0922;
+}
+
+/* Row 2: AI Assistant panel */
+.hero > div:nth-child(2) {
+  background: var(--hero-ai-bg);
+  border: 1px solid var(--hero-ai-border);
+  border-radius: 6px;
+  padding: 20px 52px;
+  margin: 0 auto;
+  max-width: 1048px;
+  position: relative;
+  z-index: 2;
+  margin-top: -80px;
+}
+
+.hero > div:nth-child(2) > div {
+  color: var(--hero-text);
+}
+
+.hero > div:nth-child(2) > div p:first-child {
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  margin: 0 0 10px;
+}
+
+.hero > div:nth-child(2) > div p:last-child {
+  font-size: 14px;
+  opacity: 0.7;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Row 3: News ticker */
+.hero > div:nth-child(3) {
+  background: var(--hero-notify-bg);
+  padding: 31px 40px;
+}
+
+.hero > div:nth-child(3) > div {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.hero > div:nth-child(3) h2 {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--hero-notify-text);
+  margin: 0;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.hero > div:nth-child(3) p {
+  color: #595959;
+  font-size: 16px;
+  margin: 0;
+}
+
+main .hero > div:nth-child(3) .button-container {
+  display: inline;
+}
+
+main .hero > div:nth-child(3) a.button:any-link {
+  background: none;
+  border: none;
+  color: #3f75a6;
+  padding: 0;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 0;
+}
+
+main .hero > div:nth-child(3) a.button:any-link:hover {
+  text-decoration: underline;
+  background: none;
+}
+
+@media (max-width: 899px) {
+  .hero > div:first-child {
+    min-height: 400px;
+  }
+
+  .hero > div:first-child > div:last-child {
+    padding: 40px 20px;
+  }
+
+  .hero > div:nth-child(2) {
+    margin-top: -40px;
+    margin-left: 16px;
+    margin-right: 16px;
+    padding: 16px 24px;
+  }
+
+  .hero > div:nth-child(3) > div {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 @media (min-width: 900px) {
-  .hero {
-    padding: 40px 32px;
+  .hero > div:first-child {
+    min-height: 600px;
   }
 }
