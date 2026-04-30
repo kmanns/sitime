@@ -200,8 +200,9 @@ export default async function decorate(block) {
 
   const updatePlaceOrderState = () => {
     if (!placeOrderApi?.setProps) return;
+    if (!agreementController.config.enabled) return;
     placeOrderApi.setProps({
-      disabled: agreementController.config.enabled && !agreementController.getState().signed,
+      disabled: !agreementController.getState().signed,
     });
   };
 
