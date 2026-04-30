@@ -182,15 +182,18 @@ export default async function decorate(block) {
   const resolvedAgreementConfig = { ...agreementConfig, enabled: AGREEMENT_GATE_ENABLED && agreementConfig.enabled };
   if (!resolvedAgreementConfig.enabled) {
     sessionStorage.removeItem('commerce-checkout-agreement');
+    $agreement.remove();
   }
   const agreementController = createAgreementController(resolvedAgreementConfig);
-  const agreementGate = renderAgreementGate($agreement, {
-    controller: agreementController,
-    getContext: () => ({
-      cartData: latestCartData,
-      checkoutData: latestCheckoutData,
-    }),
-  });
+  if (resolvedAgreementConfig.enabled) {
+    renderAgreementGate($agreement, {
+      controller: agreementController,
+      getContext: () => ({
+        cartData: latestCartData,
+        checkoutData: latestCheckoutData,
+      }),
+    });
+  }
 
   const updatePlaceOrderState = () => {
     if (!placeOrderApi?.setProps) return;
